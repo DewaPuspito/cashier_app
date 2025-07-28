@@ -1,6 +1,6 @@
 import express, { Application } from 'express';
 import cors from 'cors';
-// import { RouterNameRouter } from './routes/RouterName';
+import { AuthRouter } from './routers/auth.routes';
 
 class Server {
   private app: Application;
@@ -8,18 +8,21 @@ class Server {
 
   constructor() {
     this.app = express();
-    this.port = 3000;
+    this.port = 8000;
     this.middlewares();
     this.routes();
   }
 
   private middlewares(): void {
-    this.app.use(cors());
+    this.app.use(cors({
+      origin: 'http://localhost:3000',
+      credentials: true
+  }));
     this.app.use(express.json());
   }
 
   private routes(): void {
-    // this.app.use('/api/RouterName', new RouterNameRouter().router);
+    this.app.use('/api', new AuthRouter().router);
   }
 
   public start(): void {
