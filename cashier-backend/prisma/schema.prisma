@@ -1,0 +1,93 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(uuid())
+  name         String
+  email        String   @unique
+  password     String
+  role         Role     // 'ADMIN' or 'CASHIER'
+  isDeleted    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  shifts       Shift[]
+  transactions Transaction[]
+
+  @@map("users")
+}
+
+model Product {
+  id          String   @id @default(uuid())
+  name        String
+  price       Int
+  stock       Int
+  isDeleted   Boolean  @default(false)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  transactionItems TransactionItem[]
+
+  @@map("products")
+}
+
+model Shift {
+  id           String   @id @default(uuid())
+  cashier      User     @relation(fields: [cashierId], references: [id])
+  cashierId    String
+  startCash    Int
+  endCash      Int?
+  startTime    DateTime @default(now())
+  endTime      DateTime?
+  transactions Transaction[]
+
+  @@map("shifts")
+}
+
+model Transaction {
+  id           String   @id @default(uuid())
+  shift        Shift    @relation(fields: [shiftId], references: [id])
+  shiftId      String
+  cashier      User     @relation(fields: [cashierId], references: [id])
+  cashierId    String
+  paymentType  PaymentType // 'CASH' or 'DEBIT'
+  cashAmount   Int?    // jika CASH
+  cardNumber   String? // jika DEBIT
+  total        Int
+  createdAt    DateTime @default(now())
+  transactionItems TransactionItem[]
+
+  @@map("transactions")
+}
+
+model TransactionItem {
+  id            String   @id @default(uuid())
+  transaction   Transaction @relation(fields: [transactionId], references: [id])
+  transactionId String
+  product       Product  @relation(fields: [productId], references: [id])
+  productId     String
+  quantity      Int
+  subTotal      Int
+
+  @@map("transaction_items")
+}
+
+enum Role {
+  ADMIN
+  CASHIER
+}
+
+enum PaymentType {
+  CASH
+  DEBIT
+}
