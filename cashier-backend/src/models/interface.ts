@@ -35,12 +35,18 @@ export interface ShiftStartInput {
     name: string;
     price: number;
     stock: number;
+    category: 'FOOD' | 'DRINK' | 'CLOTHING' | 'ELECTRONICS' | 'HEALTH' | 'STATIONERY'
+    imageUrl: string;
   }
   
-  export interface ProductUpdateInput {
-    name?: string;
+  export interface ProductQuery {
+    search?: string;
     price?: number;
     stock?: number;
+    category?: 'FOOD' | 'DRINK' | 'CLOTHING' | 'ELECTRONICS' | 'HEALTH' | 'STATIONERY'
+    imageUrl?: string;
+    page?: number;
+    limit?: number;
   }
   
   

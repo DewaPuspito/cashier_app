@@ -1,19 +1,43 @@
 import { prisma } from "../prisma/client";
-import { ProductInput, ProductUpdateInput } from "../models/interface";
+import { Prisma } from "@prisma/client";
+import { ProductInput, ProductQuery } from "../models/interface";
+
+type ProductCategory = 'FOOD' | 'DRINK' | 'CLOTHING' | 'ELECTRONICS' | 'HEALTH' | 'STATIONERY'
 
 export class ProductService {
-  async findAllProduct() {
-    return await prisma.product.findMany({
-      where: { deletedAt: null },
-      orderBy: { createdAt: "desc" },
-      select: {
-        name: true,
-        price: true,
-        stock: true,
-      },
-    });
+  async findAllProduct(query: ProductQuery) {
+    const {search, price, stock, category, imageUrl, page = 1, limit = 15} = query
+
+    const where : Prisma.ProductWhereInput = {}
+
+    if (search) {
+        where.name = { contains: search, mode: 'insensitive' };
+    }
+
+    if (price) {
+      where.price = price
+    }
+
+    if (stock) {
+        where.stock = stock;
+    }
+
+    if (category) {
+        where.category = {
+          equals: category as ProductCategory
+        };
+    }
+
+    if (imageUrl) {
+      where.imageUrl = imageUrl
+    }
+
+    return prisma.product.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit
+    }) 
   }
-  
 
   async findProductDetail(id: string) {
     return await prisma.product.findUnique({ 
@@ -22,6 +46,8 @@ export class ProductService {
         name: true,
         price: true,
         stock: true,
+        category: true,
+        imageUrl: true,
       },
     })
   }
@@ -30,7 +56,7 @@ export class ProductService {
     return await prisma.product.create({ data });
   }
 
-  async updateProduct(id: string, data: ProductUpdateInput) {
+  async updateProduct(id: string, data: ProductQuery) {
     const { stock, ...otherFields } = data;
   
     return await prisma.product.update({
