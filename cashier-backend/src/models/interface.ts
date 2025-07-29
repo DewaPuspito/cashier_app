@@ -11,3 +11,36 @@ export interface UserRegister {
     password: string,
     role : 'CASHIER' | 'ADMIN'
 }
+
+export interface ShiftStartInput {
+    startCash: number;
+  }
+  
+  export interface ShiftEndInput {
+    endCash: number;
+  }
+
+  export interface ShiftResponse {
+    id: string;
+    cashierId: string;
+    startCash: number;
+    endCash?: number;
+    startTime: Date;
+    endTime?: Date;
+    totalTransactions?: number;
+  }
+  
+
+  export interface ProductInput {
+    name: string;
+    price: number;
+    stock: number;
+  }
+  
+  export interface ProductUpdateInput {
+    name?: string;
+    price?: number;
+    stock?: number;
+  }
+  
+  

@@ -1,6 +1,7 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import { AuthRouter } from './routers/auth.routes';
+import { CashierRouter } from './routers/cashier.routes';
 
 class Server {
   private app: Application;
@@ -23,6 +24,7 @@ class Server {
 
   private routes(): void {
     this.app.use('/api', new AuthRouter().router);
+    this.app.use('/api', new CashierRouter().router);
   }
 
   public start(): void {
