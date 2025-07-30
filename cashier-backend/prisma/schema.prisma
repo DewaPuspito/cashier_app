@@ -50,6 +50,7 @@ model Shift {
   cashierId    String
   startCash    Int
   endCash      Int?
+  totalTransactions Int?
   startTime    DateTime      @default(now())
   endTime      DateTime?
   transactions Transaction[]

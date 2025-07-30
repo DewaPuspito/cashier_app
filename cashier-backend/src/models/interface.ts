@@ -27,9 +27,7 @@ export interface ShiftStartInput {
     endCash?: number;
     startTime: Date;
     endTime?: Date;
-    totalTransactions?: number;
   }
-  
 
   export interface ProductInput {
     name: string;
@@ -49,4 +47,24 @@ export interface ShiftStartInput {
     limit?: number;
   }
   
+  export interface TransactionItemInput {
+    productId: string;
+    quantity: number;
+  }
+  
+  export interface TransactionInput {
+    items: TransactionItemInput[];
+    paymentType: 'CASH' | 'DEBIT';
+    cashAmount?: number;
+    cardNumber?: string;
+    userId: string;
+    shiftId: string;
+  }  
+
+  export interface TransactionQuery {
+    date?: string; 
+    shiftId?: string;
+    page?: number;
+    limit?: number;
+  }  
   
