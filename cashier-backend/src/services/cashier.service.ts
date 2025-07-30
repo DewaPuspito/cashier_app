@@ -18,6 +18,7 @@ export class CashierService {
       data: {
         cashierId,
         startCash: data.startCash,
+        totalIncome: 0
       },
     });
   }

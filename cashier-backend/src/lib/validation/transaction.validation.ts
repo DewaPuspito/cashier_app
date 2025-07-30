@@ -13,8 +13,9 @@ export const transactionSchema = {
       required_error: "Payment type is required",
     }),
 
-    cashAmount: z.number().positive({ message: "Cash amount must be greater than 0" }).optional(),
-    cardNumber: z.string().min(8, { message: "Card number too short" }).optional(),
+    cashReceived: z.number().positive({ message: "Cash received must be greater than 0" }).optional(),
+    cardNumber: z.string().min(8, { message: "Card number too short" }).
+    max(16, { message: "Card number too long" }).optional(),
   }),
   params: z.object({}),
 };

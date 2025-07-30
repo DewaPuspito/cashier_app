@@ -3,6 +3,7 @@ import cors from 'cors';
 import { AuthRouter } from './routers/auth.routes';
 import { CashierRouter } from './routers/cashier.routes';
 import { ProductRouter } from './routers/product.routes';
+import { TransactionRouter } from './routers/transaction.routes';
 
 class Server {
   private app: Application;
@@ -27,6 +28,7 @@ class Server {
     this.app.use('/api', new AuthRouter().router);
     this.app.use('/api', new CashierRouter().router);
     this.app.use('/api', new ProductRouter().router);
+    this.app.use('/api', new TransactionRouter().router);
   }
 
   public start(): void {

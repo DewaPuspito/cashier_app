@@ -16,10 +16,10 @@ export class TransactionRouter {
   }
 
   private routes(): void {
-    this.router.post('/transactions',AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowRoles('CASHIER'),
+    this.router.post('/shift/:shiftId/transactions',AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowRoles('CASHIER'),
     ValidationMiddleware.validate({ body: transactionSchema.body }), this.transactionController.create.bind(this.transactionController));
 
-    this.router.get('/transactions/history', AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowRoles('CASHIER'),
+    this.router.get('/shift/:shiftId/transactions/history', AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowRoles('CASHIER'),
     this.transactionController.getDailyHistory.bind(this.transactionController));
   }
 }

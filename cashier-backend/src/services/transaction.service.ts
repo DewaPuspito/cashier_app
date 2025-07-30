@@ -3,10 +3,9 @@ import { TransactionInput } from '../models/interface';
 
 export class TransactionService {
   async createTransaction(input: TransactionInput) {
-    const { userId, shiftId, items, paymentType, cashAmount, cardNumber } = input;
+    const { cashierId, shiftId, items, paymentType, cashReceived, cardNumber } = input;
 
-    // Validasi payment
-    if (paymentType === 'CASH' && (cashAmount === undefined || cashAmount === null)) {
+    if (paymentType === 'CASH' && (cashReceived === undefined || cashReceived === null)) {
       throw new Error("Cash amount is required for CASH payment");
     }
     if (paymentType === 'DEBIT' && (!cardNumber || cardNumber.trim() === '')) {
@@ -22,7 +21,7 @@ export class TransactionService {
       throw new Error('Invalid product(s) in request');
     }
 
-    const total = items.reduce((sum, item) => {
+    const amount = items.reduce((sum, item) => {
       const product = products.find((p) => p.id === item.productId);
       if (!product || product.stock < item.quantity) {
         throw new Error(`Insufficient stock for ${product?.name}`);
@@ -34,11 +33,12 @@ export class TransactionService {
       const transaction = await tx.transaction.create({
         data: {
           shiftId,
-          cashierId: userId,
+          cashierId,
           paymentType,
-          cashAmount: paymentType === 'CASH' ? cashAmount : null,
+          cashReceived: paymentType === 'CASH' ? cashReceived : null,
+          cashChange: paymentType === 'CASH' ? cashReceived! - amount : null,
           cardNumber: paymentType === 'DEBIT' ? cardNumber : null,
-          total,
+          amount,
           transactionItems: {
             create: items.map((item) => ({
               productId: item.productId,
@@ -48,7 +48,7 @@ export class TransactionService {
           }
         }
       });
-
+    
       for (const item of items) {
         await tx.product.update({
           where: { id: item.productId },
@@ -57,7 +57,16 @@ export class TransactionService {
           }
         });
       }
-
+    
+        await tx.shift.update({
+          where: { id: shiftId },
+          data: {
+            totalIncome: {
+              increment: amount
+            }
+          }
+        });
+    
       return transaction;
     });
   }

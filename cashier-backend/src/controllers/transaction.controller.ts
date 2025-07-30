@@ -1,21 +1,23 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
+import { RequestCollection } from '../types/express';
 import { TransactionService } from '../services/transaction.service';
 import { TransactionInput } from '../models/interface';
 
 export class TransactionController {
   private transactionService = new TransactionService();
 
-  async create(req: Request, res: Response) {
+  async create(req: RequestCollection, res: Response) {
     try {
-      const { items, paymentType, cashAmount, cardNumber } = req.body;
-      const { userId, shiftId } = (req as any).user;
+      const { items, paymentType, cashReceived, cardNumber } = req.body;
+      const cashierId = req.user.id;
+      const { shiftId } = req.params;
 
       const input: TransactionInput = {
-        userId,
+        cashierId,
         shiftId,
         items,
         paymentType,
-        cashAmount,
+        cashReceived,
         cardNumber,
       };
 
@@ -32,10 +34,10 @@ export class TransactionController {
     }
   }
 
-  async getDailyHistory(req: Request, res: Response) {
+  async getDailyHistory(req: RequestCollection, res: Response) {
     try {
-      const { userId } = (req as any).user;
-      const history = await this.transactionService.getDailyTransactions(userId);
+      const cashierId = req.user.id;
+      const history = await this.transactionService.getDailyTransactions(cashierId);
       res.status(200).json({
         message: 'Transaction history',
         data: history,

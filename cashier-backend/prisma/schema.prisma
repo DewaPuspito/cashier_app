@@ -50,9 +50,9 @@ model Shift {
   cashierId    String
   startCash    Int
   endCash      Int?
-  totalTransactions Int?
   startTime    DateTime      @default(now())
   endTime      DateTime?
+  totalIncome  Int?
   transactions Transaction[]
 
   @@map("shifts")
@@ -65,9 +65,10 @@ model Transaction {
   cashier          User              @relation(fields: [cashierId], references: [id])
   cashierId        String
   paymentType      PaymentType
-  cashAmount       Int?
+  cashReceived     Int?
+  cashChange       Int?
   cardNumber       String?
-  total            Int
+  amount           Int
   createdAt        DateTime          @default(now())
   transactionItems TransactionItem[]
 

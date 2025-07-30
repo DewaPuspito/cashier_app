@@ -55,9 +55,9 @@ export interface ShiftStartInput {
   export interface TransactionInput {
     items: TransactionItemInput[];
     paymentType: 'CASH' | 'DEBIT';
-    cashAmount?: number;
+    cashReceived?: number;
     cardNumber?: string;
-    userId: string;
+    cashierId: string;
     shiftId: string;
   }  
 
