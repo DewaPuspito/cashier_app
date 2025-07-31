@@ -15,12 +15,10 @@ export class AuthenticationMiddleware {
 
     try {
       const decoded = JwtUtils.verifyToken(token);
-      console.log("Decoded JWT payload:", decoded);
-
       if ('adminId' in decoded) {
-        req.admin = decoded;
+        req.admin = { id: decoded.adminId, ...decoded };
       } else if ('cashierId' in decoded) {
-        req.cashier = decoded;
+        req.cashier = { id: decoded.cashierId, ...decoded };
       } else {
         res.status(401).json({ message: 'Invalid token payload' });
       }
@@ -30,8 +28,6 @@ export class AuthenticationMiddleware {
       res.status(401).json({ message: 'Invalid token', error });
     }
   }
-  
-
   static checkCashierOwnership(req: RequestCollection, res: Response, next: NextFunction): void {
     try {
       if (!req.cashier || !req.shift) {
