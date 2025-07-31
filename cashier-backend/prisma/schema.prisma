@@ -13,19 +13,30 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
+model Admin {
   id           String        @id @default(uuid())
   name         String
   email        String        @unique
   password     String
-  role         Role
+  isDeleted    Boolean       @default(false)
+  createdAt    DateTime      @default(now())
+  updatedAt    DateTime      @updatedAt
+
+  @@map("admin-user")
+}
+
+model Cashier {
+  id           String        @id @default(uuid())
+  name         String
+  email        String        @unique
+  password     String
   isDeleted    Boolean       @default(false)
   createdAt    DateTime      @default(now())
   updatedAt    DateTime      @updatedAt
   shifts       Shift[]
   transactions Transaction[]
 
-  @@map("users")
+  @@map("cashiers")
 }
 
 model Product {
@@ -46,7 +57,7 @@ model Product {
 
 model Shift {
   id           String        @id @default(uuid())
-  cashier      User          @relation(fields: [cashierId], references: [id])
+  cashier      Cashier          @relation(fields: [cashierId], references: [id])
   cashierId    String
   startCash    Int
   endCash      Int?
@@ -62,7 +73,7 @@ model Transaction {
   id               String            @id @default(uuid())
   shift            Shift             @relation(fields: [shiftId], references: [id])
   shiftId          String
-  cashier          User              @relation(fields: [cashierId], references: [id])
+  cashier          Cashier              @relation(fields: [cashierId], references: [id])
   cashierId        String
   paymentType      PaymentType
   cashReceived     Int?
@@ -85,11 +96,6 @@ model TransactionItem {
   subTotal      Int
 
   @@map("transaction_items")
-}
-
-enum Role {
-  ADMIN
-  CASHIER
 }
 
 enum PaymentType {

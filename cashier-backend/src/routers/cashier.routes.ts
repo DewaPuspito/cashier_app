@@ -1,9 +1,5 @@
-import { Router } from "express";
-import { CashierController } from "../controllers/cashier.controller";
-import { AuthenticationMiddleware } from "../middlewares/authentication.middleware";
-import { AuthorizationMiddleware } from "../middlewares/authorization.middleware";
-import { ValidationMiddleware } from "../middlewares/validation.middleware";
-import { shiftSchema } from "../lib/validation/shift.validation";
+import { Router } from 'express';
+import { CashierController } from '../controllers/cashier.controller';
 
 export class CashierRouter {
   public router: Router;
@@ -16,15 +12,10 @@ export class CashierRouter {
   }
 
   private routes(): void {
-    this.router.post("/shift/start", AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowRoles("CASHIER"),
-    ValidationMiddleware.validate({ body: shiftSchema.body }), this.cashierController.startShift.bind(this.cashierController));
-
-    this.router.patch("/shift/end/:id", AuthenticationMiddleware.verifyToken, AuthenticationMiddleware.checkCashierOwnership,
-    AuthorizationMiddleware.allowRoles("CASHIER"), ValidationMiddleware.validate({body: shiftSchema.body.partial(), params: shiftSchema.params}),
-    this.cashierController.endShift.bind(this.cashierController));
-
-    this.router.get("/shift/:id", AuthenticationMiddleware.verifyToken, AuthenticationMiddleware.checkCashierOwnership,
-    AuthorizationMiddleware.allowRoles("CASHIER"),this.cashierController.myShifts.bind(this.cashierController)
-    );
+    this.router.get('/cashier', this.cashierController.getAll.bind(this.cashierController));
+    this.router.get('/cashier/:id', this.cashierController.getById.bind(this.cashierController));
+    this.router.post('/cashier', this.cashierController.create.bind(this.cashierController));
+    this.router.put('/cashier/:id', this.cashierController.update.bind(this.cashierController));
+    this.router.delete('/cashier/:id', this.cashierController.delete.bind(this.cashierController));
   }
 }

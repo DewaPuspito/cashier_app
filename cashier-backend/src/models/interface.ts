@@ -1,15 +1,24 @@
-export interface UserPayload {
-    id: string,
-    name: string,
-    email: string,
-    role: "CASHIER" | "ADMIN" | null
+export interface AdminPayload {
+  adminId: string;
+  name: string;
+  email: string;
 }
 
-export interface UserRegister {
+export interface CashierPayload {
+  cashierId: string;
+  name: string;
+  email: string;
+}
+
+export interface ShiftPayload {
+    id: string,
+    cashierId: string,
+}
+
+export interface AdminRegister {
     name: string,
     email: string,
     password: string,
-    role : 'CASHIER' | 'ADMIN'
 }
 
 export interface ShiftStartInput {

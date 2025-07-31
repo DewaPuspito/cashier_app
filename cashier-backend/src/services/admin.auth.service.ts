@@ -1,45 +1,42 @@
 import { prisma } from "../prisma/client";
 import bcrypt, { hash } from "bcrypt";
 import { JwtUtils } from "../lib/token.config";
-import { UserRegister } from "../models/interface";
+import { AdminRegister } from "../models/interface";
 
-export class AuthService {
-  public async register(data: UserRegister) {
-    const { name, email, password, role = 'CASHIER' } = data;
+export class adminAuthService {
+  public async register(data: AdminRegister) {
+    const { name, email, password } = data;
 
-    const existingUser = await prisma.user.findUnique({ where: { email } });
+    const existingUser = await prisma.admin.findUnique({ where: { email } });
     if (existingUser) {
       throw new Error("Email already registered");
     }
 
     const hashedPassword = await hash(password, 10);
 
-    const user = await prisma.user.create({
+    const user = await prisma.admin.create({
       data: {
         name,
         email,
         password: hashedPassword,
-        role,
       },
     });
 
     const token = JwtUtils.generateToken({
-      id: user.id,
+      adminId: user.id,
       name: user.name,
       email: user.email,
-      role: user.role,
     });
 
     return {
-      id: user.id,
+      adminId: user.id,
       name: user.name,
-      role: user.role,
       access_token: token,
     };
   }
 
   public async login(email: string, password: string) {
-    const user = await prisma.user.findUnique({ where: { email } });
+    const user = await prisma.admin.findUnique({ where: { email } });
 
     if (!user) {
       throw new Error("Invalid email or password");
@@ -51,16 +48,14 @@ export class AuthService {
     }
 
     const token = JwtUtils.generateToken({
-      id: user.id,
+      adminId: user.id,
       name: user.name,
-      email: user.email,
-      role: user.role,
+      email: user.email
     });
 
     return {
-      id: user.id,
+      adminId: user.id,
       name: user.name,
-      role: user.role,
       access_token: token,
     };
   }

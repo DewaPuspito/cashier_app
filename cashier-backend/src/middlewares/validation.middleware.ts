@@ -19,8 +19,10 @@ export class ValidationMiddleware {
                     } else {
                         bodySchema = schema.body
                     }
-                    if ((req).user) {
-                        req.body.userId = (req).user.userId;
+                    if (req.admin) {
+                        req.body.userId = req.admin.id;
+                    } else if (req.cashier) {
+                        req.body.userId = req.cashier.id;
                     }
                     req.body = bodySchema.parse(req.body);
                 }

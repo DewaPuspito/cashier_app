@@ -1,13 +1,13 @@
 import { Request, Response } from 'express';
-import { AuthService } from '../services/auth.service';
-import { UserRegister } from "../models/interface";
+import { adminAuthService } from '../services/admin.auth.service';
+import { AdminRegister } from "../models/interface";
 
-export class AuthController {
-  private authService = new AuthService();
+export class adminAuthController {
+  private authService = new adminAuthService();
 
   public async register(req: Request, res: Response): Promise<void> {
     try {
-      const data: UserRegister = req.body;
+      const data: AdminRegister = req.body;
       const result = await this.authService.register(data);
   
       res.status(201).json({

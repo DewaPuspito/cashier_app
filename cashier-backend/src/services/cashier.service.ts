@@ -1,54 +1,50 @@
-import { prisma } from "../prisma/client";
-import { ShiftStartInput, ShiftEndInput } from "../models/interface";
+import { prisma } from '../prisma/client';
+import { hash } from 'bcrypt';
 
 export class CashierService {
-  async startShift(cashierId: string, data: ShiftStartInput) {
-    const activeShift = await prisma.shift.findFirst({
-      where: {
-        cashierId,
-        endTime: null,
-      },
-    });
+  async getAll() {
+    return prisma.cashier.findMany({ where: { isDeleted: false } });
+  }
 
-    if (activeShift) {
-      throw new Error("You already have an active shift");
-    }
+  async getById(id: string) {
+    const cashier = await prisma.cashier.findUnique({ where: { id } });
+    if (!cashier || cashier.isDeleted) throw new Error('Cashier not found');
+    return cashier;
+  }
 
-    return await prisma.shift.create({
+  async createCashier(data: { name: string; email: string; password: string }) {
+    const hashedPassword = await hash(data.password, 10);
+    return prisma.cashier.create({
       data: {
-        cashierId,
-        startCash: data.startCash,
-        totalIncome: 0
+        name: data.name,
+        email: data.email,
+        password: hashedPassword,
       },
     });
   }
 
-  async endShift(cashierId: string, data: ShiftEndInput) {
-    const activeShift = await prisma.shift.findFirst({
-      where: {
-        cashierId,
-        endTime: null,
-      },
-      orderBy: { startTime: "desc" },
-    });
+  async updateCashier(id: string, data: { name?: string; email?: string; password?: string }) {
+    const cashier = await prisma.cashier.findUnique({ where: { id } });
+    if (!cashier || cashier.isDeleted) throw new Error('Cashier not found');
 
-    if (!activeShift) {
-      throw new Error("No active shift found");
+    const updateData: any = { ...data };
+    if (data.password) {
+      updateData.password = await hash(data.password, 10);
     }
 
-    return await prisma.shift.update({
-      where: { id: activeShift.id },
-      data: {
-        endCash: data.endCash,
-        endTime: new Date(),
-      },
+    return prisma.cashier.update({
+      where: { id },
+      data: updateData,
     });
   }
 
-  async getMyShifts(cashierId: string) {
-    return await prisma.shift.findMany({
-      where: { cashierId },
-      orderBy: { startTime: "desc" },
+  async deleteCashier(id: string) {
+    const cashier = await prisma.cashier.findUnique({ where: { id } });
+    if (!cashier || cashier.isDeleted) throw new Error('Cashier not found');
+
+    return prisma.cashier.update({
+      where: { id },
+      data: { isDeleted: true },
     });
   }
 }

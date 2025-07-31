@@ -4,50 +4,52 @@ import { JwtUtils } from "../lib/token.config";
 
 export class AuthenticationMiddleware {
   static verifyToken(req: RequestCollection, res: Response, next: NextFunction): void {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader || !authHeader.startsWith('Bearer')) {
+      res.status(401).json({ message: 'Unauthorized - Token missing' });
+      return;
+    }
+
+    const token = authHeader.split(' ')[1];
+
     try {
-      const authHeader = req.headers.authorization;
-      
-      if (!authHeader?.startsWith('Bearer')) {
-        res.status(401).json({ message: 'Unauthorized' });
-        return
+      const decoded = JwtUtils.verifyToken(token);
+      console.log("Decoded JWT payload:", decoded);
+
+      if ('adminId' in decoded) {
+        req.admin = decoded;
+      } else if ('cashierId' in decoded) {
+        req.cashier = decoded;
+      } else {
+        res.status(401).json({ message: 'Invalid token payload' });
       }
 
-      const token = authHeader.split(' ')[1];
-      const decoded = JwtUtils.verifyToken(token);
-      
-      req.user = decoded;
-      
       next();
     } catch (error) {
-      res.status(401).json({ message: 'Invalid token' });
+      res.status(401).json({ message: 'Invalid token', error });
     }
   }
+  
 
   static checkCashierOwnership(req: RequestCollection, res: Response, next: NextFunction): void {
     try {
-      if (!req.user) {
-        res.status(401).json({ message: 'Unauthorized: User not authenticated' });
-        return;
+      if (!req.cashier || !req.shift) {
+        res.status(401).json({ message: 'Unauthorized' });
       }
 
-      const userIdFromToken = req.user.id;
-      const userIdFromParams = parseInt(req.params.id);
-
-      if (isNaN(userIdFromParams)) {
-        res.status(400).json({ message: 'Bad Request: Invalid user ID' });
-        return;
-      }
-
-      if (userIdFromToken !== userIdFromParams) {
+      if (req.cashier!.id !== req.shift!.cashierId) {
         res.status(403).json({ 
-          message: 'Forbidden: You can only see or end your own shift' 
+          message: 'Forbidden: You can only see or end your own shift',
         });
-        return;
       }
 
       next();
     } catch (error) {
-      res.status(500).json({ message: 'Internal server error' });
+      res.status(500).json({ 
+        message: 'Internal server error',
+        error: error
+      });
     }
   }
 }

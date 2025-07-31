@@ -7,28 +7,26 @@ const prisma = new PrismaClient();
 
 async function main() {
   const hashedPassword = await bcrypt.hash('admin123', 10);
-  await prisma.user.upsert({
+  await prisma.admin.upsert({
     where: { email: 'admin@kasir.com' },
     update: {},
     create: {
       name: 'Admin Kasir',
       email: 'admin@kasir.com',
       password: hashedPassword,
-      role: 'ADMIN',
     },
   });
 
-  const cashierPassword = await bcrypt.hash('cashier123', 10);
-  await prisma.user.upsert({
-    where: { email: 'kasir@kasir.com' },
+  const hashedPassword2 = await bcrypt.hash('kasir123', 10);
+  await prisma.cashier.upsert({
+    where: { email: 'kasir1@kasir.com' },
     update: {},
     create: {
       name: 'Kasir 1',
-      email: 'kasir@kasir.com',
-      password: cashierPassword,
-      role: 'CASHIER',
+      email: 'kasir1@mail.com',
+      password: hashedPassword2,
     },
-  });
+  })
 
   await prisma.product.createMany({
     data: [

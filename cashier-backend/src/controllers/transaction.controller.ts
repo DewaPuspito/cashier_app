@@ -9,7 +9,7 @@ export class TransactionController {
   async create(req: RequestCollection, res: Response) {
     try {
       const { items, paymentType, cashReceived, cardNumber } = req.body;
-      const cashierId = req.user.id;
+      const cashierId = req.cashier!.id;
       const { shiftId } = req.params;
 
       const input: TransactionInput = {
@@ -36,7 +36,7 @@ export class TransactionController {
 
   async getDailyHistory(req: RequestCollection, res: Response) {
     try {
-      const cashierId = req.user.id;
+      const cashierId = req.cashier!.id;
       const history = await this.transactionService.getDailyTransactions(cashierId);
       res.status(200).json({
         message: 'Transaction history',
