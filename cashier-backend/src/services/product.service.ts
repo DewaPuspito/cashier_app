@@ -8,7 +8,9 @@ export class ProductService {
   async findAllProduct(query: ProductQuery) {
     const {search, price, stock, category, imageUrl, page = 1, limit = 15} = query
 
-    const where : Prisma.ProductWhereInput = {}
+    const where : Prisma.ProductWhereInput = {
+      isDeleted: false
+    }
 
     if (search) {
         where.name = { contains: search, mode: 'insensitive' };
@@ -41,7 +43,7 @@ export class ProductService {
 
   async findProductDetail(id: string) {
     return await prisma.product.findUnique({ 
-      where: { id },
+      where: { id, isDeleted: false  },
       select: {
         name: true,
         price: true,
@@ -58,6 +60,17 @@ export class ProductService {
 
   async updateProduct(id: string, data: ProductQuery) {
     const { stock, ...otherFields } = data;
+  
+    const product = await prisma.product.findUnique({ where: { id } });
+    if (!product || product.isDeleted) throw new Error("Product not found");
+  
+    if (typeof stock === "number" && stock !== 0) {
+      const finalStock = product.stock + stock;
+  
+      if (finalStock < 0) {
+        throw new Error("Stock cannot be negative");
+      }
+    }
   
     return await prisma.product.update({
       where: { id },
@@ -77,7 +90,10 @@ export class ProductService {
   async softDeleteProduct(id: string) {
     return await prisma.product.update({
       where: { id },
-      data: { deletedAt: new Date() },
+      data: {
+        isDeleted: true,
+        deletedAt: new Date(),
+      },
     });
   }
 }

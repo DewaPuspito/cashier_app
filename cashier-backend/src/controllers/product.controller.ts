@@ -110,27 +110,32 @@ export class ProductController {
     }
   }  
 
-  async delete(id: string) {
-    const product = await prisma.product.findUnique({ where: { id } });
+  public async delete(req: Request, res: Response): Promise<void> {
+    try {
+      const id = req.params.id;
+      const product = await this.productService.findProductDetail(id);
   
-    if (!product) {
-      throw new Error("Product not found");
-    }
+      if (!product) {
+        res.status(404).json({ message: "Product not found" });
+        return;
+      }
   
-    if (product.imageUrl) {
-      try {
+      if (product.imageUrl) {
         const publicId = product.imageUrl.split('/').pop()?.split('.')[0];
         if (publicId) {
           await this.cloudinaryService.deleteFile(publicId);
         }
-      } catch (err) {
-        console.error("Failed to delete image from Cloudinary", err);
       }
-    }
   
-    return await prisma.product.update({
-      where: { id },
-      data: { deletedAt: new Date() },
-    });
-  }  
+      const result = await this.productService.softDeleteProduct(id);
+  
+      res.status(200).json({
+        message: "Product deleted successfully",
+        data: result,
+      });
+    } catch (error: any) {
+      console.error("Error in softDelete:", error);
+      res.status(error.status || 500).json({ message: error.message });
+    }
+  }
 }
