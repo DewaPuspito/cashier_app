@@ -29,6 +29,22 @@ export class TransactionService {
       return sum + product.price * item.quantity;
     }, 0);
 
+    const shift = await prisma.shift.findUnique({
+      where: { id: shiftId }
+    });
+  
+    if (!shift) {
+      throw new Error('Shift not found');
+    }
+  
+    if (shift.endCash !== null) {
+      throw new Error('Transaction not allowed. Shift has already been closed.');
+    }
+  
+    if (paymentType === 'CASH' && cashReceived! < amount) {
+      throw new Error('Insufficient cash received');
+    }
+
     return await prisma.$transaction(async (tx) => {
       const transaction = await tx.transaction.create({
         data: {

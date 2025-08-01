@@ -44,11 +44,4 @@ export class ShiftService {
       },
     });
   }
-
-  async getMyShifts(cashierId: string) {
-    return await prisma.shift.findMany({
-      where: { cashierId },
-      orderBy: { startTime: "desc" },
-    });
-  }
 }

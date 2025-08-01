@@ -16,17 +16,11 @@ export class ShiftRouter {
   }
 
   private routes(): void {
-    this.router.post("/shift/start", 
-      AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowCashier,
-    ValidationMiddleware.validate({ body: shiftSchema.body }), 
-    this.ShiftController.startShift.bind(this.ShiftController));
+    this.router.post("/shift/start", AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowCashier, 
+    ValidationMiddleware.validate({ body: shiftSchema.body }), this.ShiftController.startShift.bind(this.ShiftController));
 
     this.router.patch("/shift/:id/end", AuthenticationMiddleware.verifyToken, AuthenticationMiddleware.checkCashierOwnership,
     AuthorizationMiddleware.allowCashier, ValidationMiddleware.validate({body: shiftSchema.body.partial(), params: shiftSchema.params}),
     this.ShiftController.endShift.bind(this.ShiftController));
-
-    this.router.get("/shift/:id", AuthenticationMiddleware.verifyToken, AuthenticationMiddleware.checkCashierOwnership,
-    AuthorizationMiddleware.allowCashier,this.ShiftController.myShifts.bind(this.ShiftController)
-    );
   }
 }

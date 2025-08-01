@@ -29,25 +29,4 @@ export class ShiftController {
       res.status(400).json({ message: error.message || "Failed to end shift" });
     }
   }
-
-  public async myShifts(req: RequestCollection, res: Response) {
-    try {
-      const cashierId = req.cashier?.id!;
-      const shifts = await this.shiftService.getMyShifts(cashierId);
-  
-      const result: ShiftResponse[] = shifts.map(shift => ({
-        id: shift.id,
-        cashierId: shift.cashierId,
-        startCash: shift.startCash,
-        endCash: shift.endCash ?? undefined,
-        startTime: shift.startTime,
-        endTime: shift.endTime ?? undefined,
-      }));
-  
-      res.status(200).json({ message: "Shifts fetched", data: result });
-    } catch (error) {
-      res.status(500).json({ message: "Failed to fetch shifts" });
-    }
-  }
-  
 }
