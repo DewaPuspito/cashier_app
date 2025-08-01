@@ -6,6 +6,7 @@ import { CashierRouter } from './routers/cashier.routes';
 import { ShiftRouter } from './routers/shift.routes';
 import { ProductRouter } from './routers/product.routes';
 import { TransactionRouter } from './routers/transaction.routes';
+import { ReportRouter } from './routers/report.routes';
 
 class Server {
   private app: Application;
@@ -33,6 +34,7 @@ class Server {
     this.app.use('/api', new ShiftRouter().router);
     this.app.use('/api', new ProductRouter().router);
     this.app.use('/api', new TransactionRouter().router);
+    this.app.use('/api', new ReportRouter().router);
   }
 
   public start(): void {

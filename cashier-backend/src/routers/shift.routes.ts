@@ -21,7 +21,7 @@ export class ShiftRouter {
     ValidationMiddleware.validate({ body: shiftSchema.body }), 
     this.ShiftController.startShift.bind(this.ShiftController));
 
-    this.router.patch("/shift/end/:id", AuthenticationMiddleware.verifyToken, AuthenticationMiddleware.checkCashierOwnership,
+    this.router.patch("/shift/:id/end", AuthenticationMiddleware.verifyToken, AuthenticationMiddleware.checkCashierOwnership,
     AuthorizationMiddleware.allowCashier, ValidationMiddleware.validate({body: shiftSchema.body.partial(), params: shiftSchema.params}),
     this.ShiftController.endShift.bind(this.ShiftController));
 
