@@ -21,7 +21,6 @@ export class CloudinaryService {
                 },
                 (error, result: UploadApiResponse | undefined) => {
                     if (error) {
-                        console.log("Upload Error: ", error)
                         return reject(error)
                     }
                     resolve(result?.secure_url || '')

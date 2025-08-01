@@ -11,7 +11,6 @@ export class JwtUtils {
   private static expiration: `${number}d` = '7d';
 
   static generateToken(payload: AnyPayload) {
-    console.log("GENERATING TOKEN WITH PAYLOAD:", payload);
     return jwt.sign(payload, this.secret, {
       expiresIn: this.expiration,
     });
