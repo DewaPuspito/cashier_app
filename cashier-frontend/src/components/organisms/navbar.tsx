@@ -43,9 +43,6 @@ export const Navbar = () => {
             <Link href="/admin/cashiers" className="hover:underline">
               Cashiers
             </Link>
-            <Link href="/admin/reports" className="hover:underline">
-              Reports
-            </Link>
           </>
         )}
         {isCashier && (
@@ -55,9 +52,6 @@ export const Navbar = () => {
             </Link>
             <Link href="/cashier/transactions" className="hover:underline">
               Transactions
-            </Link>
-            <Link href="/cashier/history" className="hover:underline">
-              History
             </Link>
           </>
         )}
