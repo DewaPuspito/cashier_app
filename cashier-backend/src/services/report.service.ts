@@ -1,23 +1,17 @@
 import { prisma } from "../prisma/client";
 
 export class ReportService {
-  async getDailyReport(dateStr: string) {
+  async getDailyReport(dateStr: string, page = 1, limit = 10) {
     const start = new Date(dateStr + "T00:00:00");
     const end = new Date(dateStr + "T23:59:59.999");
-
+  
+    // Summary tetap
     const transactions = await prisma.transaction.findMany({
       where: {
-        createdAt: {
-          gte: start,
-          lte: end
-        }
-      },
-      include: {
-        transactionItems: true,
-        shift: true,
-      },
+        createdAt: { gte: start, lte: end }
+      }
     });
-
+  
     const summary = {
       totalTransactions: transactions.length,
       totalIncome: transactions.reduce((sum, tx) => sum + tx.amount, 0),
@@ -28,7 +22,14 @@ export class ReportService {
         .filter((tx) => tx.paymentType === "DEBIT")
         .reduce((sum, tx) => sum + tx.amount, 0)
     };
-
+  
+    // Total shifts
+    const totalShifts = await prisma.shift.count({
+      where: {
+        startTime: { gte: start, lte: end }
+      }
+    });
+  
     const shifts = await prisma.shift.findMany({
       where: {
         startTime: { gte: start, lte: end }
@@ -36,18 +37,20 @@ export class ReportService {
       include: {
         cashier: true,
         transactions: true
-      }
+      },
+      skip: (page - 1) * limit,
+      take: limit
     });
-
+  
     const shiftReports = shifts.map((shift) => {
       const cashTx = shift.transactions.filter((t) => t.paymentType === "CASH");
       const debitTx = shift.transactions.filter((t) => t.paymentType === "DEBIT");
-
+  
       const cashTotal = cashTx.reduce((sum, tx) => sum + tx.amount, 0);
       const debitTotal = debitTx.reduce((sum, tx) => sum + tx.amount, 0);
       const expectedEndCash = shift.startCash + cashTotal;
       const actualEndCash = shift.endCash ?? 0;
-
+  
       return {
         shiftId: shift.id,
         cashier: {
@@ -64,26 +67,29 @@ export class ReportService {
         isMismatch: actualEndCash !== expectedEndCash
       };
     });
-
+  
     return {
       date: dateStr,
       summary,
-      shifts: shiftReports
+      shifts: shiftReports,
+      pagination: {
+        page,
+        limit,
+        totalData: totalShifts,
+        totalPage: Math.ceil(totalShifts / limit)
+      }
     };
   }
-
-  async getDailyItemReport(dateStr: string) {
+  
+  async getDailyItemReport(dateStr: string, page = 1, limit = 10) {
     const start = new Date(dateStr + "T00:00:00");
     const end = new Date(dateStr + "T23:59:59.999");
-
+  
     const items = await prisma.transactionItem.groupBy({
       by: ["productId"],
       where: {
         transaction: {
-          createdAt: {
-            gte: start,
-            lte: end
-          }
+          createdAt: { gte: start, lte: end }
         }
       },
       _sum: {
@@ -91,18 +97,21 @@ export class ReportService {
         subTotal: true
       }
     });
-
+  
+    const totalItems = items.length;
+    const paginatedItems = items.slice((page - 1) * limit, page * limit);
+  
     const products = await prisma.product.findMany({
       where: {
-        id: { in: items.map(i => i.productId) }
+        id: { in: paginatedItems.map(i => i.productId) }
       },
       select: {
         id: true,
         name: true
       }
     });
-
-    const report = items.map(item => {
+  
+    const report = paginatedItems.map(item => {
       const product = products.find(p => p.id === item.productId);
       return {
         productId: item.productId,
@@ -111,10 +120,16 @@ export class ReportService {
         totalRevenue: item._sum.subTotal || 0
       };
     });
-
+  
     return {
       date: dateStr,
-      items: report
+      items: report,
+      pagination: {
+        page,
+        limit,
+        totalData: totalItems,
+        totalPage: Math.ceil(totalItems / limit)
+      }
     };
   }
-}
+}  
