@@ -1,24 +1,23 @@
-export interface AdminPayload {
-  adminId: string;
+interface BaseAuthPayload {
   name: string;
   email: string;
 }
 
-export interface CashierPayload {
-  cashierId: string;
-  name: string;
-  email: string;
+export interface AdminPayload extends BaseAuthPayload {
+  adminId: string;
+  role: 'admin';
 }
+
+export interface CashierPayload extends BaseAuthPayload {
+  cashierId: string;
+  role: 'cashier';
+}
+
+export type AuthPayload = AdminPayload | CashierPayload;
 
 export interface ShiftPayload {
     id: string,
     cashierId: string,
-}
-
-export interface AdminRegister {
-    name: string,
-    email: string,
-    password: string,
 }
 
 export interface ShiftStartInput {
