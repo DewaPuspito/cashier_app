@@ -7,21 +7,30 @@ import axios from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/useAuthStore';
 
-export const LoginFormCashier = () => {
+export const LoginForm = () => {
   const router = useRouter();
+  const loginAsAdmin = useAuthStore((state) => state.loginAsAdmin);
   const loginAsCashier = useAuthStore((state) => state.loginAsCashier);
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [role, setRole] = useState<'admin' | 'cashier'>('admin');
   const [error, setError] = useState('');
 
   const handleLogin = async () => {
     try {
-      const res = await axios.post('/cashier/auth/login', { email, password });
-      const { token, cashier } = res.data;
+      const res = await axios.post('/auth/login', { email, password, role });
 
+      const { token, admin, cashier } = res.data;
       localStorage.setItem('token', token);
-      loginAsCashier(cashier);
-      router.push('/shift');
+
+      if (role === 'admin') {
+        loginAsAdmin(admin);
+        router.push('/admin/reports');
+      } else {
+        loginAsCashier(cashier);
+        router.push('/cashier/shift');
+      }
     } catch (err: any) {
       setError(err.response?.data?.message || 'Login failed');
     }
@@ -44,8 +53,7 @@ export const LoginFormCashier = () => {
     <div className="w-full max-w-md mx-auto mt-12 bg-white p-8 rounded-3xl shadow-lg">
       <div className="space-y-6">
         <div className="text-center space-y-2">
-          <h2 className="text-2xl font-semibold text-gray-900">Cashier Login</h2>
-          <p className="text-gray-500 text-sm">Log in to Continue</p>
+          <h2 className="text-2xl font-semibold text-gray-900">Login</h2>
         </div>
 
         {error && (
@@ -64,6 +72,7 @@ export const LoginFormCashier = () => {
             placeholder="Enter your email"
             icon={<EmailIcon />}
           />
+
           <InputWithLabel
             label="Password"
             name="password"
@@ -73,6 +82,19 @@ export const LoginFormCashier = () => {
             placeholder="Enter your password"
             icon={<PasswordIcon />}
           />
+
+          <div className="space-y-2">
+            <label htmlFor="role" className="block text-sm font-medium text-gray-700">Login as</label>
+            <select
+              id="role"
+              value={role}
+              onChange={(e) => setRole(e.target.value as 'admin' | 'cashier')}
+              className="w-full border rounded-md px-3 py-2 text-sm text-gray-700"
+            >
+              <option value="admin">Admin</option>
+              <option value="cashier">Cashier</option>
+            </select>
+          </div>
         </div>
 
         <Button onClick={handleLogin}>Sign In</Button>
