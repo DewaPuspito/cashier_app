@@ -1,20 +1,16 @@
-import React from 'react';
+import { InputHTMLAttributes } from 'react';
 
-interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
-  icon?: React.ReactNode;
+interface InputProps extends InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
 }
 
-export const Input: React.FC<InputProps> = ({ icon, className = '', ...props }) => {
+export const Input = ({ label, ...props }: InputProps) => {
   return (
-    <div className="relative">
-      {icon && (
-        <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400">
-          {icon}
-        </span>
-      )}
+    <div className="space-y-1">
+      {label && <label className="text-sm font-medium text-gray-700">{label}</label>}
       <input
-        className={`w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 ${icon ? 'pl-10' : ''} text-gray-800 placeholder-gray-400 ${className}`}
         {...props}
+        className="w-full px-3 py-2 border rounded-md focus:outline-none focus:ring focus:border-blue-300"
       />
     </div>
   );
