@@ -23,9 +23,15 @@ export const Modal = ({ open, onClose, title, children }: ModalProps) => {
 
   return ReactDOM.createPortal(
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
-      <div className="bg-white w-full max-w-md rounded-lg p-6 shadow-lg">
-        {title && <h2 className="text-lg font-bold mb-4">{title}</h2>}
-        {children}
+      <div className="bg-white w-full max-w-md rounded-lg shadow-lg overflow-hidden">
+        {title && (
+          <div className="bg-white px-6 py-4 border-b">
+            <h2 className="text-lg font-semibold text-center text-gray-900">{title}</h2>
+          </div>
+        )}
+        <div className="p-6">
+          {children}
+        </div>
       </div>
     </div>,
     document.body

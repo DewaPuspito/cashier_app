@@ -1,9 +1,47 @@
 import { prisma } from '../prisma/client';
 import { hash } from 'bcrypt';
+import { Prisma } from '@prisma/client';
 
 export class CashierService {
-  async getAll() {
-    return prisma.cashier.findMany({ where: { isDeleted: false } });
+  async getAll(page = 1, limit = 10, search?: string) {
+    const where: Prisma.CashierWhereInput = {
+      isDeleted: false,
+      ...(search && {
+        OR: [
+          {
+            name: {
+              contains: search,
+              mode: 'insensitive' as Prisma.QueryMode
+            }
+          },
+          {
+            email: {
+              contains: search,
+              mode: 'insensitive' as Prisma.QueryMode
+            }
+          }
+        ]
+      })
+    };
+
+    const [total, cashiers] = await Promise.all([
+      prisma.cashier.count({ where }),
+      prisma.cashier.findMany({
+        where,
+        skip: (page - 1) * limit,
+        take: limit,
+        orderBy: { createdAt: 'asc' }
+      })
+    ]);
+
+    const totalPages = Math.ceil(total / limit);
+
+    return {
+      data: cashiers,
+      totalPages,
+      currentPage: page,
+      totalItems: total
+    };
   }
 
   async getById(id: string) {

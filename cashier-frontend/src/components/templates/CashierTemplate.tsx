@@ -1,18 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { Cashier } from '@/types/user';
 import { CashierFilterBar } from '../molecules/CashierFilterBar';
 import { CashierTable } from '../molecules/CashierTable';
-import { CashierFormModal } from '../organisms/CashierFormModal';
+import { PaginationControls } from '../molecules/PaginationControls';
 import axios from '@/lib/axios';
 
 export const AdminCashierTemplate = () => {
   const [cashiers, setCashiers] = useState<Cashier[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCashier, setSelectedCashier] = useState<Cashier | null>(null);
-  const [isModalOpen, setIsModalOpen] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const router = useRouter();
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
@@ -34,13 +36,16 @@ export const AdminCashierTemplate = () => {
               Authorization: `Bearer ${token}`,
             },
             params: {
-              search: searchTerm,
+              search: searchTerm.toLowerCase(),
+              page: currentPage,
+              limit: 10
             },
           });
-          if (res.data && Array.isArray(res.data)) {
-            const cashierArray = Object.values(res.data);
-            if (cashierArray.length > 0) {
-              setCashiers(cashierArray);
+          if (res.data) {
+            const { data, totalPages: total } = res.data;
+            if (Array.isArray(data) && data.length > 0) {
+              setCashiers(data);
+              setTotalPages(total);
             } else {
               setCashiers([]);
             }
@@ -53,10 +58,9 @@ export const AdminCashierTemplate = () => {
           setCashiers([]);
         }
       };
-    
-
-    fetchCashiers();
-  }, [token, searchTerm]);
+  
+      fetchCashiers();
+    }, [token, searchTerm, currentPage]);
 
   const refresh = async () => {
     if (!token) return;
@@ -87,11 +91,6 @@ export const AdminCashierTemplate = () => {
     }
   };
 
-  const handleEdit = (cashier: Cashier) => {
-    setSelectedCashier(cashier);
-    setIsModalOpen(true);
-  };
-
   const handleDelete = async (id: string) => {
     if (!token) return console.warn('No token found for delete.');
     try {
@@ -106,42 +105,6 @@ export const AdminCashierTemplate = () => {
     }
   };
 
-  const handleSubmit = async (data: {
-    name: string;
-    email: string;
-    password?: string;
-  }) => {
-    if (!token) return console.warn('No token found for submit.');
-    try {
-      if (selectedCashier) {
-        await axios.put(
-          `/cashier/${selectedCashier.id}`,
-          { name: data.name, email: data.email },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      } else {
-        await axios.post(
-          '/cashier',
-          { ...data },
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-      }
-      setIsModalOpen(false);
-      setSelectedCashier(null);
-      await refresh();
-    } catch (err) {
-      console.error('Failed to submit cashier:', err);
-    }
-  };
-
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-6 px-6 py-8">
@@ -149,30 +112,26 @@ export const AdminCashierTemplate = () => {
 
         <div className="space-y-4">
           <div className="flex justify-between items-center">
-            <CashierFilterBar
-              onSearch={(query: string) => setSearchTerm(query)}
-              onAdd={() => {
-                setSelectedCashier(null);
-                setIsModalOpen(true);
-              }}
+          <CashierFilterBar
+            onSearch={(query: string) => setSearchTerm(query)}
+            onAdd={() => {
+                router.push('/admin/cashier/create-cashier');
+            }}
             />
           </div>
 
           <CashierTable
             data={cashiers}
-            onEdit={handleEdit}
+            onEdit={(cashier) => router.push(`/admin/cashier/${cashier.id}/edit-cashier`)}
             onDelete={handleDelete}
           />
 
-          <CashierFormModal
-            open={isModalOpen}
-            onClose={() => {
-              setIsModalOpen(false);
-              setSelectedCashier(null);
-            }}
-            initialData={selectedCashier || undefined}
-            onSubmit={handleSubmit}
+          <PaginationControls 
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
           />
+
         </div>
       </div>
     </div>
