@@ -3,7 +3,7 @@ import { hash } from 'bcrypt';
 import { Prisma } from '@prisma/client';
 
 export class CashierService {
-  async getAll(page = 1, limit = 10, search?: string) {
+  async getAll(page = 1, limit = 20, search?: string) {
     const where: Prisma.CashierWhereInput = {
       isDeleted: false,
       ...(search && {

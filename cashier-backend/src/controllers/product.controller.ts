@@ -22,7 +22,7 @@ export class ProductController {
         stock: req.query.stock? parseInt(req.query.stock as string) : undefined,
         category: req.query.category as Category,
         page: req.query.page ? parseInt(req.query.page as string) : 1,
-        limit: req.query.limit ? parseInt(req.query.limit as string) : 15,
+        limit: req.query.limit ? parseInt(req.query.limit as string) : 20,
       };
       const result = await this.productService.findAllProduct(query);
       res.status(200).json({

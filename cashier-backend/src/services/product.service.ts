@@ -6,7 +6,7 @@ type ProductCategory = 'FOOD' | 'DRINK' | 'CLOTHING' | 'ELECTRONICS' | 'HEALTH' 
 
 export class ProductService {
   async findAllProduct(query: ProductQuery) {
-    const {search, price, stock, category, imageUrl, page = 1, limit = 15} = query
+    const {search, price, stock, category, imageUrl, page = 1, limit = 20} = query
 
     const where : Prisma.ProductWhereInput = {
       isDeleted: false
