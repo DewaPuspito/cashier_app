@@ -7,6 +7,7 @@ import { CashierFilterBar } from '../molecules/CashierFilterBar';
 import { CashierTable } from '../molecules/CashierTable';
 import { PaginationControls } from '../molecules/PaginationControls';
 import axios from '@/lib/axios';
+import Swal from 'sweetalert2';
 
 export const AdminCashierTemplate = () => {
   const [cashiers, setCashiers] = useState<Cashier[]>([]);
@@ -93,15 +94,40 @@ export const AdminCashierTemplate = () => {
 
   const handleDelete = async (id: string) => {
     if (!token) return console.warn('No token found for delete.');
-    try {
-      await axios.delete(`/cashier/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      await refresh();
-    } catch (err) {
-      console.error('Failed to delete cashier:', err);
+    
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Cashier data will be deleted permanently.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (result.isConfirmed) {
+      try {
+        await axios.delete(`/cashier/${id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        await refresh();
+        
+        Swal.fire(
+          'Deleted!',
+          'Cashier data has been deleted.',
+          'success'
+        );
+      } catch (err) {
+        console.error('Failed to delete cashier:', err);
+        Swal.fire(
+          'Error!',
+          'Failed to delete cashier. Please try again later.',
+          'error'
+        );
+      }
     }
   };
 
