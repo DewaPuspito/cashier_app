@@ -1,0 +1,11 @@
+import { AdminProductTemplate } from '@/components/templates/AdminProductTemplate';
+import { Navbar } from '@/components/organisms/Navbar';
+
+export default function CashierPage() {
+return (
+    <div className="min-h-screen bg-gray-50">
+        <Navbar />
+        <AdminProductTemplate />
+    </div>
+);
+}

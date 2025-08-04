@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { Cashier } from '@/types/user';
-import { CashierFilterBar } from '../molecules/CashierFilterBar';
+import { Button } from '../atomics/Button';
+import { SearchBar } from '../molecules/SearchBar';
 import { CashierTable } from '../molecules/CashierTable';
 import { PaginationControls } from '../molecules/PaginationControls';
 import axios from '@/lib/axios';
@@ -137,14 +138,14 @@ export const AdminCashierTemplate = () => {
         <h2 className="text-3xl font-bold text-gray-900 text-center">Cashiers</h2>
 
         <div className="space-y-4">
-          <div className="flex justify-between items-center">
-          <CashierFilterBar
-            onSearch={(query: string) => setSearchTerm(query)}
-            onAdd={() => {
-                router.push('/admin/cashier/create-cashier');
-            }}
-            />
-          </div>
+        <SearchBar onSearch={(query: string) => setSearchTerm(query)} />
+            <Button 
+              variant="primary" 
+              onClick={() => router.push('/admin/cashier/create-cashier')} 
+              className="px-3 py-1 text-sm border text-green-600 hover:bg-green-700 rounded-lg"
+            >
+              + Add Cashier
+            </Button>
 
           <CashierTable
             data={cashiers}

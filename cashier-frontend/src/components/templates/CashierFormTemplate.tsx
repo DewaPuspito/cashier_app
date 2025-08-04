@@ -28,7 +28,7 @@ export const CashierFormTemplate = ({ mode, id }: Props) => {
       .then((res) => setInitialData(res.data))
       .catch((err) => {
         console.error(err);
-        toast.error('Gagal memuat data kasir');
+        toast.error('Failed to load cashier data');
       });
     }
   }, [id, mode]);
@@ -61,7 +61,7 @@ export const CashierFormTemplate = ({ mode, id }: Props) => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-center bg-gray-100">
+    <div className="min-h-screen flex justify-center items-start pt-20 bg-gray-100">
       <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
         <h2 className="text-xl font-bold mb-4 text-center text-gray-900">
           {mode === 'create' ? 'Add New Cashier' : 'Edit Cashier'}

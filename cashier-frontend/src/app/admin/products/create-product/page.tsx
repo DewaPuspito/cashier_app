@@ -1,11 +1,11 @@
-import { CashierFormTemplate } from '@/components/templates/CashierFormTemplate';
+import { ProductFormTemplate } from "@/components/templates/AdminProductFormTemplate";
 import { Navbar } from '@/components/organisms/Navbar';
 
 export default function CreateCashierPage() {
 return (
     <div className="min-h-screen bg-gray-50">
         <Navbar />
-        <CashierFormTemplate mode="create" />;
+        <ProductFormTemplate mode="create" />;
     </div>
 )
 }

@@ -6,7 +6,7 @@ type ProductCategory = 'FOOD' | 'DRINK' | 'CLOTHING' | 'ELECTRONICS' | 'HEALTH' 
 
 export class ProductService {
   async findAllProduct(query: ProductQuery) {
-    const {search, price, stock, category, imageUrl, page = 1, limit = 20} = query
+    const {search, price, stock, category, page = 1, limit = 20} = query
 
     const where : Prisma.ProductWhereInput = {
       isDeleted: false
@@ -30,10 +30,6 @@ export class ProductService {
         };
     }
 
-    if (imageUrl) {
-      where.imageUrl = imageUrl
-    }
-
     return prisma.product.findMany({
         where,
         skip: (page - 1) * limit,
@@ -46,8 +42,6 @@ export class ProductService {
       where: { id, isDeleted: false  },
       select: {
         name: true,
-        price: true,
-        stock: true,
         category: true,
         imageUrl: true,
       },

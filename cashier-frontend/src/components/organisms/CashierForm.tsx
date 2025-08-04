@@ -3,12 +3,7 @@
 import { Input } from '../atomics/Input';
 import { Button } from '../atomics/Button';
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
-
-interface CashierFormData {
-  name: string;
-  email: string;
-  password?: string;
-}
+import { CashierFormData } from '@/types/cashier';
 
 interface CashierFormProps {
   initialData?: {

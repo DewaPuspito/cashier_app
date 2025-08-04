@@ -69,7 +69,7 @@ export const Navbar = () => {
             Transactions
           </Link>
         )}
-       <Button variant="secondary" onClick={handleLogout} className="flex items-center gap-2">
+       <Button variant="danger" onClick={handleLogout} className="flex items-center gap-2">
           <Image src="/globe.svg" alt="Logout Icon" width={20} height={20} />
           Logout
         </Button>

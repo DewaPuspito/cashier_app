@@ -1,4 +1,3 @@
-import { prisma } from "../prisma/client";
 import { Request, Response } from "express";
 import { ProductService } from "../services/product.service";
 import { ProductInput, ProductQuery } from "../models/interface";
