@@ -43,6 +43,7 @@ export class ProductService {
       select: {
         name: true,
         price: true,
+        stock: true,
         category: true,
         imageUrl: true,
       },
@@ -59,10 +60,8 @@ export class ProductService {
     const product = await prisma.product.findUnique({ where: { id } });
     if (!product || product.isDeleted) throw new Error("Product not found");
   
-    if (typeof stock === "number" && stock !== 0) {
-      const finalStock = product.stock + stock;
-  
-      if (finalStock < 0) {
+    if (typeof stock === "number") {
+      if (stock < 0) {
         throw new Error("Stock cannot be negative");
       }
     }
@@ -71,13 +70,7 @@ export class ProductService {
       where: { id },
       data: {
         ...otherFields,
-        ...(typeof stock === "number" && stock !== 0
-          ? {
-              stock: {
-                increment: stock,
-              },
-            }
-          : {}),
+        ...(typeof stock === "number" ? { stock } : {}),
       },
     });
   }

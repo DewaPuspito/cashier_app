@@ -7,6 +7,7 @@ import axios from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { toast } from 'react-hot-toast';
+import { z } from 'zod';
 
 export const LoginForm = () => {
   const router = useRouter();
@@ -18,9 +19,16 @@ export const LoginForm = () => {
   const [role, setRole] = useState<'admin' | 'cashier'>('admin');
   const [error, setError] = useState('');
 
+  const loginSchema = z.object({
+    email: z.string().email({ message: "Invalid email format" }),
+    password: z.string().min(1, { message: "Password is required" }),
+    role: z.enum(['admin', 'cashier'])
+  });
+
   const handleLogin = async () => {
     try {
-      const res = await axios.post('/auth/login', { email, password, role });
+      const validatedData = loginSchema.parse({ email, password, role });
+      const res = await axios.post('/auth/login', validatedData);
   
       const { access_token, ...user } = res.data.data;
       localStorage.setItem('token', access_token);
@@ -35,6 +43,11 @@ export const LoginForm = () => {
         router.push('/cashier/shift');
       }
     } catch (err: any) {
+      if (err instanceof z.ZodError) {
+        const errors = err.errors.map(e => e.message);
+        toast.error(errors.join('\n'));
+        return;
+      }
       toast.error(err.response?.data?.message || 'Login Failed');
     }
   };

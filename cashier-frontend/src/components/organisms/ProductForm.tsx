@@ -4,11 +4,23 @@ import { Input } from '../atomics/Input';
 import { Button } from '../atomics/Button';
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Category, ProductFormData } from '@/types/product';
+import { z } from 'zod';
+import { toast } from'react-hot-toast';
 
 interface ProductFormProps {
   initialData?: ProductFormData;
   onSubmit: (data: FormData) => void;
 }
+
+const productSchema = z.object({
+  name: z.string().min(1, { message: "Product name must be at least 1 character" }),
+  price: z.number().int({ message: "Price must be a number" }).positive({ message: "Price must be greater than zero" }),
+  stock: z.number().int({ message: "Stock must be a number" }),
+  category: z.enum(["FOOD", "DRINK", "CLOTHING", "ELECTRONICS", "HEALTH", "STATIONERY"], {
+    invalid_type_error: "Invalid category"
+  }),
+  imageUrl: z.instanceof(File).or(z.string().url({ message: "Invalid image URL" }))
+});
 
 export const ProductForm = ({ initialData, onSubmit }: ProductFormProps) => {
   const [formData, setFormData] = useState<ProductFormData>({
@@ -50,18 +62,28 @@ export const ProductForm = ({ initialData, onSubmit }: ProductFormProps) => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-
-    const data = new FormData();
-    data.append('name', formData.name);
-    data.append('price', formData.price.toString());
-    data.append('stock', formData.stock.toString());
-    data.append('category', formData.category);
-
-    if (formData.imageUrl instanceof File) {
-      data.append('imageUrl', formData.imageUrl);
+    try {
+      const validatedData = productSchema.parse(formData);
+      const data = new FormData();
+    
+      data.append('name', validatedData.name);
+      data.append('price', validatedData.price.toString());
+      data.append('stock', validatedData.stock.toString());
+      data.append('category', validatedData.category);
+      
+      if (validatedData.imageUrl instanceof File) {
+        data.append('imageUrl', validatedData.imageUrl);
+      } else if (typeof validatedData.imageUrl === 'string') {
+        data.append('imageUrl', validatedData.imageUrl);
+      }
+      
+      onSubmit(data);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        const errors = err.errors.map(e => e.message);
+        toast.error(errors.join('\n'));
+      }
     }
-
-    onSubmit(data);
   };
 
   const isUpdate = Boolean(initialData);

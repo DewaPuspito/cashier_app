@@ -4,6 +4,8 @@ import { Input } from '../atomics/Input';
 import { Button } from '../atomics/Button';
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { CashierFormData } from '@/types/cashier';
+import {toast} from 'react-hot-toast';
+import { z } from 'zod';
 
 interface CashierFormProps {
   initialData?: {
@@ -12,6 +14,18 @@ interface CashierFormProps {
   };
   onSubmit: (data: CashierFormData) => void;
 }
+
+const createCashierSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters')
+});
+
+const updateCashierSchema = z.object({
+  name: z.string().min(1, 'Name is required'),
+  email: z.string().email('Invalid email'),
+  password: z.string().min(6, 'Password must be at least 6 characters').optional()
+});
 
 export const CashierForm = ({ initialData, onSubmit }: CashierFormProps) => {
   const [formData, setFormData] = useState<CashierFormData>({
@@ -39,8 +53,16 @@ export const CashierForm = ({ initialData, onSubmit }: CashierFormProps) => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    console.log('Form data:', formData);
-    onSubmit(formData);
+    try {
+      const schema = initialData ? updateCashierSchema : createCashierSchema;
+      const validatedData = schema.parse(formData);
+      onSubmit(validatedData);
+    } catch (err) {
+      if (err instanceof z.ZodError) {
+        const errors = err.errors.map(e => e.message);
+        toast.error(errors.join('\n'));
+      }
+    }
   };
 
   const isUpdate = Boolean(initialData);

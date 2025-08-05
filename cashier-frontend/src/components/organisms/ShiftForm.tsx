@@ -6,6 +6,19 @@ import { InputWithLabel } from '../molecules/InputWithLabel';
 import { Button } from '../atomics/Button';
 import axios from '@/lib/axios';
 import toast from 'react-hot-toast';
+import { z } from 'zod';
+
+const startShiftSchema = z.object({
+  startCash: z.number()
+    .int("Start cash must be an integer")
+    .nonnegative("Start cash cannot be negative")
+});
+
+const endShiftSchema = z.object({
+  endCash: z.number()
+    .int("End cash must be an integer")
+    .nonnegative("End cash cannot be negative")
+});
 
 export const ShiftForm = () => {
   const [startCash, setStartCash] = useState('');
@@ -16,6 +29,7 @@ export const ShiftForm = () => {
 
   const handleStartShift = async () => {
     try {
+      const validatedData = startShiftSchema.parse({ startCash: Number(startCash) });
       const token = localStorage.getItem('token');
       if (!token) {
         toast.error('Unauthorized');
@@ -24,20 +38,26 @@ export const ShiftForm = () => {
       }
 
       const response = await axios.post('/shift/start', 
-        { startCash: Number(startCash) },
+        validatedData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
       setActiveShiftId(response.data.data.id);
       setIsShiftStarted(true);
       toast.success('Shift started successfully');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to start shift');
+    } catch (err: any) {
+      if (err instanceof z.ZodError) {
+        const errors = err.errors.map(e => e.message);
+        toast.error(errors.join('\n'));
+        return;
+      }
+      toast.error(err.response?.data?.message || 'Failed to start shift');
     }
   };
 
   const handleEndShift = async () => {
     try {
+      const validatedData = endShiftSchema.parse({ endCash: Number(endCash) });
       const token = localStorage.getItem('token');
       if (!token) {
         toast.error('Unauthorized');
@@ -47,7 +67,7 @@ export const ShiftForm = () => {
 
       await axios.patch(
         `/shift/${activeShiftId}/end`,
-        { endCash: Number(endCash) },
+        validatedData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -55,8 +75,13 @@ export const ShiftForm = () => {
       setStartCash('');
       setEndCash('');
       toast.success('Shift ended successfully');
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || 'Failed to end shift');
+    } catch (err: any) {
+      if (err instanceof z.ZodError) {
+        const errors = err.errors.map(e => e.message);
+        toast.error(errors.join('\n'));
+        return;
+      }
+      toast.error(err.response?.data?.message || 'Failed to end shift');
     }
   };
 
