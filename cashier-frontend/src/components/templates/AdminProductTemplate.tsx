@@ -7,6 +7,7 @@ import { SearchBar } from '../molecules/SearchBar';
 import { ProductFilters } from '../molecules/ProductFilters';
 import { Button } from '../atomics/Button';
 import axios from '@/lib/axios';
+import Swal from 'sweetalert2';
 
 export const AdminProductTemplate = () => {
   const [products, setProducts] = useState<Product[]>([]);
@@ -55,6 +56,51 @@ export const AdminProductTemplate = () => {
 
     fetchProducts();
   }, [token]);
+
+  const handleEdit = (product: Product) => {
+    window.location.href = `/admin/products/${product.id}/edit-product`;
+  };
+
+  const handleDelete = async (productId: string) => {
+    const result = await Swal.fire({
+      title: 'Are you sure?',
+      text: 'Product data will be deleted permanently.',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6',
+      cancelButtonColor: '#d33',
+      confirmButtonText: 'Yes',
+      cancelButtonText: 'Cancel'
+    });
+
+    if (!result.isConfirmed) return;
+
+    try {
+      await axios.delete(`/products/${productId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+
+      const updated = products.filter((p) => p.id !== productId);
+      setProducts(updated);
+      setFiltered(updated);
+
+      Swal.fire(
+        'Deleted!',
+        'Product data has been deleted.',
+        'success'
+      );
+    } catch (err) {
+      console.error('Failed to delete product:', err);
+      Swal.fire(
+        'Error!',
+        'Failed to delete product. Please try again later.',
+        'error'
+      );
+    }
+  }
+
 
   const handleSearch = (query: string) => {
     const result = products.filter((p) =>
@@ -107,8 +153,13 @@ export const AdminProductTemplate = () => {
         ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {Array.isArray(finalFiltered) &&
-            finalFiltered.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              finalFiltered.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
             ))}
         </div>
         )}

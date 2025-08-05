@@ -42,6 +42,7 @@ export class ProductService {
       where: { id, isDeleted: false  },
       select: {
         name: true,
+        price: true,
         category: true,
         imageUrl: true,
       },

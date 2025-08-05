@@ -53,8 +53,8 @@ export const ProductForm = ({ initialData, onSubmit }: ProductFormProps) => {
 
     const data = new FormData();
     data.append('name', formData.name);
-    data.append('price', String(formData.price));
-    data.append('stock', String(formData.stock));
+    data.append('price', formData.price.toString());
+    data.append('stock', formData.stock.toString());
     data.append('category', formData.category);
 
     if (formData.imageUrl instanceof File) {

@@ -25,7 +25,14 @@ export const ProductFormTemplate = ({ mode, id }: Props) => {
       axios.get(`/products/${id}`, {
         headers: { Authorization: `Bearer ${savedToken}` },
       })
-      .then((res) => setInitialData(res.data))
+      .then((res) => {
+        // Pastikan kita mengakses data dengan benar dan mengkonversi price ke number
+        const productData = res.data.data;
+        setInitialData({
+          ...productData,
+          price: Number(productData.price) // Konversi price ke number
+        });
+      })
       .catch((err) => {
         console.error(err);
         toast.error('Failed to load products');
@@ -35,9 +42,9 @@ export const ProductFormTemplate = ({ mode, id }: Props) => {
 
   const handleSubmit = async (data: FormData) => {
     if (!token) return;
-  
+
     const loadingToast = toast.loading(mode === 'create' ? 'Adding Product...' : 'Updating Product...');
-  
+
     try {
       if (mode === 'create') {
         await axios.post('/products', data, {
@@ -54,7 +61,7 @@ export const ProductFormTemplate = ({ mode, id }: Props) => {
         });
         toast.success('Product successfully updated');
       }
-  
+
       router.push('/admin/products');
     } catch (err) {
       console.error('Submit failed:', err);
@@ -63,7 +70,6 @@ export const ProductFormTemplate = ({ mode, id }: Props) => {
       toast.dismiss(loadingToast);
     }
   };
-  
 
   return (
     <div className="min-h-screen flex justify-center items-start pt-10 bg-gray-100">

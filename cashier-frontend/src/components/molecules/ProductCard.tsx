@@ -1,12 +1,15 @@
 import Image from 'next/image';
 import { Product } from '@/types/product';
+import { Button } from '../atomics/Button';
 
 interface Props {
   product: Product;
+  onEdit: (product: Product) => void;
+  onDelete: (productId: string) => void;
 }
 
-export const ProductCard = ({ product }: Props) => {
-  const { name, category, stock, imageUrl, price } = product;
+export const ProductCard = ({ product, onEdit, onDelete }: Props) => {
+  const { name, category, stock, imageUrl, price, id } = product;
 
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden flex flex-col h-full">
@@ -27,6 +30,15 @@ export const ProductCard = ({ product }: Props) => {
         <p className="mt-auto text-blue-600 text-lg font-bold mt-2">
           Rp {price.toLocaleString()}
         </p>
+
+        <div className="mt-4 flex gap-2">
+          <Button variant="secondary" onClick={() => onEdit(product)}>
+            Edit
+          </Button>
+          <Button variant="danger" onClick={() => onDelete(id)}>
+            Delete
+          </Button>
+        </div>
       </div>
     </div>
   );
