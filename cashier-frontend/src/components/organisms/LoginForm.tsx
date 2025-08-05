@@ -6,6 +6,7 @@ import { Button } from '../atomics/Button';
 import axios from '@/lib/axios';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/useAuthStore';
+import { toast } from 'react-hot-toast';
 
 export const LoginForm = () => {
   const router = useRouter();
@@ -26,13 +27,15 @@ export const LoginForm = () => {
   
       if (role === 'admin') {
         loginAsAdmin(user);
+        toast.success('Login successful');
         router.push('/admin/reports');
       } else {
         loginAsCashier(user);
+        toast.success('Login successful');
         router.push('/cashier/shift');
       }
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed');
+      toast.error(err.response?.data?.message || 'Login Failed');
     }
   };
   
@@ -96,8 +99,9 @@ export const LoginForm = () => {
             </select>
           </div>
         </div>
-
-        <Button onClick={handleLogin}>Sign In</Button>
+        <div className="flex justify-center">
+          <Button onClick={handleLogin}>Sign In</Button>
+        </div>
       </div>
     </div>
   );

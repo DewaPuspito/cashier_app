@@ -58,7 +58,7 @@ export const AdminReportTemplate = () => {
   }, [date, pageShift, pageSold]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-7xl mx-auto space-y-6 px-6 py-8">
         <h2 className="text-3xl font-bold text-gray-900 text-center">Reports</h2>
         <DateFilter value={date} onChange={(d) => {setDate(d); setPageShift(1); setPageSold(1)}} />

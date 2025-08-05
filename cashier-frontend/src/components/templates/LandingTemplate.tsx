@@ -13,7 +13,7 @@ export const LandingTemplate = () => {
 
       <Heading level={1} className="text-2xl text-cyan-600 mb-4">Welcome to SigmaMart Web Cashier</Heading>
 
-      <div className="flex flex-col gap-4 w-full max-w-xs">
+      <div className="flex flex-col gap-4 max-w-xs">
         <Button onClick={() => router.push('/login')}>
           Login
         </Button>
