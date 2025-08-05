@@ -5,6 +5,7 @@ import { Product } from '@/types/product';
 import { ProductCard } from '../molecules/ProductCard';
 import { SearchBar } from '../molecules/SearchBar';
 import { ProductFilters } from '../molecules/ProductFilters';
+import { PaginationControls } from '../molecules/PaginationControls';
 import { Button } from '../atomics/Button';
 import axios from '@/lib/axios';
 import Swal from 'sweetalert2';
@@ -16,6 +17,8 @@ export const AdminProductTemplate = () => {
   const [stockRange, setStockRange] = useState<[number, number]>([0, Infinity]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, Infinity]);
   const [token, setToken] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
@@ -101,7 +104,6 @@ export const AdminProductTemplate = () => {
     }
   }
 
-
   const handleSearch = (query: string) => {
     const result = products.filter((p) =>
       p.name.toLowerCase().includes(query.toLowerCase())
@@ -131,6 +133,15 @@ export const AdminProductTemplate = () => {
         p.price >= priceRange[0] &&
         p.price <= priceRange[1]
     );
+
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentProducts = filtered.slice(startIndex, endIndex);
+
+    const handlePageChange = (page: number) => {
+      setCurrentPage(page);
+    };
 
   return (
     <section className="px-8 py-6 min-h-screen bg-gray-50">
@@ -163,6 +174,11 @@ export const AdminProductTemplate = () => {
             ))}
         </div>
         )}
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
     </section>
   );
 };

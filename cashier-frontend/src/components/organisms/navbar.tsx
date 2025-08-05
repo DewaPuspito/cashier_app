@@ -38,7 +38,7 @@ export const Navbar = () => {
   const redirectPath = admin ? '/admin/reports' : '/cashier/shift';
 
   return (
-    <nav className="w-full bg-teal-500 text-white px-6 py-4 shadow-md flex justify-between items-center">
+    <nav className="fixed top-0 left-0 right-0 z-50 w-full bg-teal-500 text-white px-6 py-4 shadow-md flex justify-between items-center">
       <div>
         <Link href={redirectPath}>
           <Image
