@@ -33,28 +33,28 @@ export const ProductFormTemplate = ({ mode, id }: Props) => {
     }
   }, [id, mode]);
 
-  const handleSubmit = async (data: { name: string; price: number; stock: number; category: Category; imageUrl: string }) => {
+  const handleSubmit = async (data: FormData) => {
     if (!token) return;
-
+  
     const loadingToast = toast.loading(mode === 'create' ? 'Adding Product...' : 'Updating Product...');
-
+  
     try {
       if (mode === 'create') {
         await axios.post('/products', data, {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          });
-          
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         toast.success('Product successfully added');
       } else if (id) {
         await axios.put(`/products/${id}`, data, {
-          headers: { Authorization: `Bearer ${token}` },
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         });
         toast.success('Product successfully updated');
       }
-
+  
       router.push('/admin/products');
     } catch (err) {
       console.error('Submit failed:', err);
@@ -63,6 +63,7 @@ export const ProductFormTemplate = ({ mode, id }: Props) => {
       toast.dismiss(loadingToast);
     }
   };
+  
 
   return (
     <div className="min-h-screen flex justify-center items-start pt-10 bg-gray-100">

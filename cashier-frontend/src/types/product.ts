@@ -12,7 +12,7 @@ export interface ProductFormData {
     price: number;
     stock: number;
     category: Category
-    imageUrl: string;
+    imageUrl: string | File;
 }
 
 export enum Category {

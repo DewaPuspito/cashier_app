@@ -4,17 +4,10 @@ import { Input } from '../atomics/Input';
 import { Button } from '../atomics/Button';
 import { useState, useEffect, ChangeEvent, FormEvent } from 'react';
 import { Category, ProductFormData } from '@/types/product';
-import { uploadImage } from '@/lib/cloudinary';
 
 interface ProductFormProps {
-  initialData?: {
-    name: string;
-    price: number;
-    stock: number;
-    category: Category;
-    imageUrl: string;
-  };
-  onSubmit: (data: ProductFormData) => void;
+  initialData?: ProductFormData;
+  onSubmit: (data: FormData) => void;
 }
 
 export const ProductForm = ({ initialData, onSubmit }: ProductFormProps) => {
@@ -25,62 +18,52 @@ export const ProductForm = ({ initialData, onSubmit }: ProductFormProps) => {
     category: Category.FOOD,
     imageUrl: '',
   });
-  const [imageUrl, setImageUrl] = useState<string>("");
+
+  const [imagePreviewUrl, setImagePreviewUrl] = useState<string>('');
 
   useEffect(() => {
     if (initialData) {
-      setFormData({
-        name: initialData.name,
-        price: initialData.price,
-        stock: initialData.stock,
-        category: initialData.category,
-        imageUrl: initialData.imageUrl,
-      });
+      setFormData(initialData);
+      if (typeof initialData.imageUrl === 'string') {
+        setImagePreviewUrl(initialData.imageUrl);
+      }
     }
   }, [initialData]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value,
+      [e.target.name]: e.target.type === 'number' ? Number(e.target.value) : e.target.value,
     });
   };
 
-  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleImageUpload = (e: ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
-  
-    try {
-      const uploadedUrl = await uploadImage(file);
-      setImageUrl(uploadedUrl);
-      setFormData((prev) => ({
-        ...prev,
-        imageUrl: uploadedUrl,
-      }));
-    } catch (err) {
-      console.error("Failed to upload image:", err);
-    }
+
+    setFormData({
+      ...formData,
+      imageUrl: file,
+    });
+    setImagePreviewUrl(URL.createObjectURL(file));
   };
-  
-  const handleSubmit = async (e: FormEvent) => {
+
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-  
-    try {
-      const finalData: ProductFormData = {
-        ...formData,
-        price: Number(formData.price),
-        stock: Number(formData.stock),
-        imageUrl,
-      };
-  
-      console.log('Final submitted data:', finalData);
-      onSubmit(finalData);
-    } catch (error) {
-      console.error('Image upload failed:', error);
+
+    const data = new FormData();
+    data.append('name', formData.name);
+    data.append('price', String(formData.price));
+    data.append('stock', String(formData.stock));
+    data.append('category', formData.category);
+
+    if (formData.imageUrl instanceof File) {
+      data.append('imageUrl', formData.imageUrl);
     }
+
+    onSubmit(data);
   };
-  
-  
+
   const isUpdate = Boolean(initialData);
 
   return (
@@ -127,20 +110,19 @@ export const ProductForm = ({ initialData, onSubmit }: ProductFormProps) => {
           ))}
         </select>
       </div>
-       <Input
+      <Input
         label="Product Image"
         name="imageUrl"
         type="file"
         accept="image/*"
         onChange={handleImageUpload}
-        required
-        className="bg-gray-500 border border-black"
+        required={!isUpdate}
       />
-      {formData.imageUrl && (
+      {imagePreviewUrl && (
         <div className="mt-2">
-          <img 
-            src={formData.imageUrl} 
-            alt="Preview" 
+          <img
+            src={imagePreviewUrl}
+            alt="Preview"
             className="w-32 h-32 object-cover rounded-lg"
           />
         </div>
