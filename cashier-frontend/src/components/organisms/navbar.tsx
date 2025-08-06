@@ -65,7 +65,7 @@ export const Navbar = () => {
         </>
       )}
         {cashier && (
-          <Link href="/cashier/transactions" className="hover:underline">
+          <Link href="/cashier/transaction" className="hover:underline">
             Transactions
           </Link>
         )}

@@ -17,10 +17,8 @@ export class ProductRouter {
   }
 
   private routes(): void {
-    this.router.get("/products", AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowAdmin, 
-    this.productController.findAll.bind(this.productController));
-    this.router.get("/products/:id", AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowAdmin, 
-    this.productController.findById.bind(this.productController));
+    this.router.get("/products", AuthenticationMiddleware.verifyToken, this.productController.findAll.bind(this.productController));
+    this.router.get("/products/:id", AuthenticationMiddleware.verifyToken, this.productController.findById.bind(this.productController));
     this.router.post("/products", AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowAdmin, upload.single('imageUrl'), 
     ValidationMiddleware.validate({body: productSchema.body}), this.productController.create.bind(this.productController));
     this.router.put("/products/:id", AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowAdmin, upload.single('imageUrl'), 

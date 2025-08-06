@@ -96,6 +96,7 @@ export const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
             type="password"
             placeholder="Enter your password"
+            showPasswordToggle={true}
             icon={<PasswordIcon />}
           />
 

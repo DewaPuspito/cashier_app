@@ -9,6 +9,7 @@ interface InputWithLabelProps {
   onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
   placeholder?: string;
   icon?: React.ReactNode;
+  showPasswordToggle?: boolean;
 }
 
 export const InputWithLabel: React.FC<InputWithLabelProps> = ({
@@ -19,6 +20,7 @@ export const InputWithLabel: React.FC<InputWithLabelProps> = ({
   onChange,
   placeholder,
   icon,
+  showPasswordToggle,
 }) => (
   <div className="space-y-2">
     <Label htmlFor={name}>{label}</Label>
@@ -30,6 +32,7 @@ export const InputWithLabel: React.FC<InputWithLabelProps> = ({
       onChange={onChange}
       placeholder={placeholder}
       icon={icon}
+      showPasswordToggle={showPasswordToggle}
     />
   </div>
 );

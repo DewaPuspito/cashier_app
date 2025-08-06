@@ -1,6 +1,6 @@
 'use client';
 
-import { ShiftForm } from '../organisms/ShiftForm';
+import ShiftForm from '../organisms/ShiftForm';
 
 export const ShiftTemplate = () => {
   return (

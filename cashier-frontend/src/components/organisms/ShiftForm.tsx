@@ -1,31 +1,41 @@
-'use client'
+'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
-import { InputWithLabel } from '../molecules/InputWithLabel';
-import { Button } from '../atomics/Button';
+import { Button } from '@/components/atomics/Button';
+import { Heading } from '@/components/atomics/Heading';
+import { Input } from '@/components/atomics/Input';
+import { Label } from '@/components/atomics/Label';
+import { toast } from 'react-hot-toast';
 import axios from '@/lib/axios';
-import toast from 'react-hot-toast';
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { z } from 'zod';
 
 const startShiftSchema = z.object({
-  startCash: z.number()
-    .int("Start cash must be an integer")
-    .nonnegative("Start cash cannot be negative")
+  startCash: z
+    .number({ required_error: 'Start Cash is required' })
+    .min(0, 'Start Cash cannot be negative'),
 });
 
 const endShiftSchema = z.object({
-  endCash: z.number()
-    .int("End cash must be an integer")
-    .nonnegative("End cash cannot be negative")
+  endCash: z
+    .number({ required_error: 'End Cash is required' })
+    .min(0, 'End Cash cannot be negative'),
 });
 
-export const ShiftForm = () => {
+export default function ShiftForm() {
   const [startCash, setStartCash] = useState('');
   const [endCash, setEndCash] = useState('');
   const [isShiftStarted, setIsShiftStarted] = useState(false);
-  const [activeShiftId, setActiveShiftId] = useState('');
+  const [activeShiftId, setActiveShiftId] = useState<string | null>(null);
   const router = useRouter();
+
+  useEffect(() => {
+    const savedShiftId = localStorage.getItem('shiftId');
+    if (savedShiftId) {
+      setActiveShiftId(savedShiftId);
+      setIsShiftStarted(true);
+    }
+  }, []);
 
   const handleStartShift = async () => {
     try {
@@ -37,12 +47,16 @@ export const ShiftForm = () => {
         return;
       }
 
-      const response = await axios.post('/shift/start', 
+      const response = await axios.post(
+        '/shift/start',
         validatedData,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
-      setActiveShiftId(response.data.data.id);
+      const shiftId = response.data.data.id;
+
+      setActiveShiftId(shiftId);
+      localStorage.setItem('shiftId', shiftId);
       setIsShiftStarted(true);
       toast.success('Shift started successfully');
     } catch (err: any) {
@@ -59,7 +73,7 @@ export const ShiftForm = () => {
     try {
       const validatedData = endShiftSchema.parse({ endCash: Number(endCash) });
       const token = localStorage.getItem('token');
-      if (!token) {
+      if (!token || !activeShiftId) {
         toast.error('Unauthorized');
         router.push('/login');
         return;
@@ -71,9 +85,9 @@ export const ShiftForm = () => {
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
+      localStorage.removeItem('shiftId');
+      setActiveShiftId(null);
       setIsShiftStarted(false);
-      setStartCash('');
-      setEndCash('');
       toast.success('Shift ended successfully');
     } catch (err: any) {
       if (err instanceof z.ZodError) {
@@ -86,50 +100,34 @@ export const ShiftForm = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-50 p-6 bg-white rounded-lg shadow-lg">
-      <h2 className="text-2xl font-bold text-center text-gray-900 mb-6">
-        {isShiftStarted ? 'End Shift' : 'Start Shift'}
-      </h2>
-      <div className="space-y-4">
-        {!isShiftStarted ? (
-          <>
-          <InputWithLabel
-            label="Start Cash"
-            name="startCash"
+    <div className="max-w-md mx-auto mt-20 p-6 border rounded-xl shadow-md bg-white">
+      <Heading level={2}>{isShiftStarted ? 'End Shift' : 'Start Shift'}</Heading>
+
+      {!isShiftStarted ? (
+        <>
+          <Label htmlFor="startCash" className="mt-4 block">Start Cash</Label>
+          <Input
+            id="startCash"
             type="number"
             value={startCash}
             onChange={(e) => setStartCash(e.target.value)}
-            placeholder="Enter start cash amount"
           />
-          <Button
-            onClick={handleStartShift}
-            disabled={!startCash}
-            className="w-full"
-          >
-            Start Shift
-          </Button>
+          <Button onClick={handleStartShift} className="mt-4 w-full">Start Shift</Button>
         </>
       ) : (
         <>
-          <InputWithLabel
-            label="End Cash"
-            name="endCash"
+          <Label htmlFor="endCash" className="mt-4 block">End Cash</Label>
+          <Input
+            id="endCash"
             type="number"
             value={endCash}
             onChange={(e) => setEndCash(e.target.value)}
-            placeholder="Enter end cash amount"
           />
-          <Button
-            onClick={handleEndShift}
-            disabled={!endCash}
-            className="w-full"
-            variant="danger"
-          >
+          <Button onClick={handleEndShift} variant="danger" className="mt-4 w-full">
             End Shift
           </Button>
         </>
-        )}
-      </div>
+      )}
     </div>
   );
-};
+}

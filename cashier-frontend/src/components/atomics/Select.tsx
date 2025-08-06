@@ -1,20 +1,21 @@
-import React from 'react';
-
-interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
-  options: { value: string; label: string }[];
+type Option = {
+  value: string
+  label: string
 }
 
-export const Select: React.FC<SelectProps> = ({ options, ...props }) => {
-  return (
-    <select
-      className="border border-gray-300 rounded px-3 py-2 w-full focus:outline-none focus:ring-2 focus:ring-blue-500"
-      {...props}
-    >
-      {options.map((opt) => (
-        <option key={opt.value} value={opt.value}>
-          {opt.label}
-        </option>
-      ))}
-    </select>
-  );
-};
+type SelectProps = {
+  value: string
+  onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void
+  options: Option[]
+  className?: string
+}
+
+export const Select = ({ value, onChange, options, className }: SelectProps) => (
+  <select value={value} onChange={onChange} className={className}>
+    {options.map((opt) => (
+      <option key={opt.value} value={opt.value}>
+        {opt.label}
+      </option>
+    ))}
+  </select>
+)
