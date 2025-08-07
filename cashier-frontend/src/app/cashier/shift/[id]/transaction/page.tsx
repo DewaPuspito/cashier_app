@@ -1,21 +1,31 @@
 'use client'
 
-import { useParams } from 'next/navigation'
+import { useEffect } from 'react'
+import { useParams, useRouter } from 'next/navigation'
 import { Navbar } from '@/components/organisms/Navbar'
 import { TransactionFormTemplate } from '@/components/templates/TransactionFormTemplate'
-import { ShiftGuard } from '@/components/molecules/ShiftGuard'
 
 export default function TransactionPage() {
   const { id: shiftId } = useParams()
+  const router = useRouter()
 
-  if (!shiftId || typeof shiftId !== 'string') return null
+  useEffect(() => {
+    const savedShiftId = localStorage.getItem('shiftId')
+    
+    if (!savedShiftId) {
+      router.push('/cashier/shift')
+      return
+    }
+
+    if (shiftId !== savedShiftId) {
+      router.push(`/cashier/shift/${savedShiftId}/transaction`)
+    }
+  }, [shiftId, router])
 
   return (
-    <ShiftGuard>
-      <div className="min-h-screen bg-gray-50 pt-20">
-        <Navbar />
-        <TransactionFormTemplate shiftId={shiftId} />
-      </div>
-    </ShiftGuard>
+    <div className="min-h-screen bg-gray-50 pt-20">
+      <Navbar />
+      <TransactionFormTemplate />
+    </div>
   )
 }

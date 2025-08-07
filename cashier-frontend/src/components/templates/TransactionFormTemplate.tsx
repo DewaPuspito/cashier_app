@@ -6,20 +6,26 @@ import { TransactionForm } from '@/components/organisms/TransactionForm'
 import { Product } from '@/types/product'
 import axios from '@/lib/axios'
 import Swal from 'sweetalert2'
+import { useRouter } from 'next/navigation'
 
-interface TransactionFormTemplateProps {
-  shiftId: string
-}
-
-export const TransactionFormTemplate: React.FC<TransactionFormTemplateProps> = ({ shiftId }) => {
+export const TransactionFormTemplate = () => {
   const [products, setProducts] = useState<Product[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [token, setToken] = useState<string | null>(null)
+  const [shiftId, setShiftId] = useState<string | null>(null)
+  const router = useRouter()
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token')
-    if (!savedToken) return
+    const savedShiftId = localStorage.getItem('shiftId')
+    
+    if (!savedToken || !savedShiftId) {
+      router.push('/cashier/shift')
+      return
+    }
+    
     setToken(savedToken)
+    setShiftId(savedShiftId)
   }, [])
 
   useEffect(() => {
@@ -50,7 +56,7 @@ export const TransactionFormTemplate: React.FC<TransactionFormTemplateProps> = (
   }, [token])
 
   const handleSubmit = async (formData: TransactionInput) => {
-    if (!token) return
+    if (!token || !shiftId) return
 
     setIsSubmitting(true)
 
@@ -66,7 +72,7 @@ export const TransactionFormTemplate: React.FC<TransactionFormTemplateProps> = (
         title: 'Transaction successful!',
       })
 
-      window.location.href = '/cashier/history'
+      router.push('/cashier/history')
     } catch (error) {
       console.error(error)
       Swal.fire({
@@ -78,6 +84,8 @@ export const TransactionFormTemplate: React.FC<TransactionFormTemplateProps> = (
       setIsSubmitting(false)
     }
   }
+
+  if (!shiftId) return null
 
   return (
     <div className="p-8 max-w-4xl mx-auto">

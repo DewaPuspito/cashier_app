@@ -11,9 +11,10 @@ export const ShiftGuard = ({ children }: { children: React.ReactNode }) => {
   const [checked, setChecked] = useState(false);
 
   useEffect(() => {
+    const savedShiftId = localStorage.getItem('shiftId');
     const shiftId = params?.id;
 
-    if (!shiftId || shiftId === 'null' || typeof shiftId !== 'string') {
+    if (!savedShiftId || savedShiftId !== shiftId) {
       toast.error('Please start your shift first.');
       router.push('/cashier/shift');
       return;
