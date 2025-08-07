@@ -2,8 +2,8 @@ import React from 'react';
 import { Product } from '@/types/product';
 import { TransactionItemInput } from '@/types/transaction';
 import { Input } from '@/components/atomics/Input';
-import { Select } from '@/components/atomics/Select';
 import { Button } from '@/components/atomics/Button';
+import ReactSelect from 'react-select';
 
 export interface ProductRowProps {
   index: number;
@@ -30,24 +30,27 @@ export const ProductRow: React.FC<ProductRowProps> = ({
 
   return (
     <div className="flex items-center space-x-4">
-      <Select
-        value={selectedProductId}
-        onChange={(e) =>
+      <ReactSelect
+        className="w-1/2 text-black border-black"
+        value={products
+          .map((product) => ({
+            value: product.id,
+            label: product.name,
+          }))
+          .find((option) => option.value === selectedProductId) || null}
+        onChange={(selectedOption) =>
           onChange({
-            productId: e.target.value,
+            productId: selectedOption?.value || '',
             quantity,
           })
         }
-        options={[
-          { value: '', label: 'Select a product' },
-          ...products.map((product) => ({
-            value: product.id,
-            label: product.name,
-          })),
-        ]}
-        className="border rounded px-2 py-1 text-black"
+        options={products.map((product) => ({
+          value: product.id,
+          label: product.name,
+        }))}
+        placeholder="Select a product"
+        isSearchable
       />
-
 
       <Input
         type="number"

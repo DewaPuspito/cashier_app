@@ -98,7 +98,7 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
       <hr />
 
       <div className="flex justify-between items-center">
-        <p className="text-lg font-bold">Total: Rp {calculateTotal().toLocaleString()}</p>
+        <p className="text-lg font-bold text-black">Total: Rp {calculateTotal().toLocaleString()}</p>
         <Button variant="primary" onClick={handleSubmit} disabled={isSubmitting}>
           {isSubmitting ? 'Processing...' : 'Checkout'}
         </Button>

@@ -1,6 +1,8 @@
 'use client';
 
 import { useState } from 'react';
+import ReactSelect from'react-select';
+
 
 interface ProductFiltersProps {
     categoryOptions: string[];
@@ -17,6 +19,7 @@ export const ProductFilters = ({
 }: ProductFiltersProps) => {
   const [stockRange, setStockRange] = useState<[number, number]>([0, Infinity]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, Infinity]);
+  const [selectedCategory, setSelectedCategory] = useState<{ label: string; value: string } | null>(null);
 
   const handleStockChange = (value: number, isMin: boolean) => {
     const newRange: [number, number] = [
@@ -36,21 +39,28 @@ export const ProductFilters = ({
     onPriceRangeChange(newRange);
   };
 
+  const categoryOptionsFormatted = [
+    { value: '', label: 'All Categories' },
+    ...categoryOptions.map((cat) => ({ value: cat, label: cat })),
+  ];
+
   return (
     <div className="flex items-center gap-6 mb-6">
-      <select
-        onChange={(e) => onCategoryChange(e.target.value)}
-        className="px-4 py-2 bg-gray-100 rounded-lg text-gray-900"
-      >
-        <option value="">All Categories</option>
-        {categoryOptions.map((cat) => (
-          <option key={cat} value={cat}>
-            {cat}
-          </option>
-        ))}
-      </select>
+      <div className="w-48">
+        <ReactSelect
+          isSearchable={false}
+          options={categoryOptionsFormatted}
+          value={selectedCategory}
+          onChange={(selected) => {
+            const value = selected?.value ?? '';
+            setSelectedCategory(selected);
+            onCategoryChange(value);
+          }}
+          className="text-black border-black"
+        />
+      </div>
 
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-2 flex-wrap">
         <span className="text-sm text-gray-700">Stock:</span>
         <input
           type="number"
@@ -59,7 +69,7 @@ export const ProductFilters = ({
           onChange={(e) => handleStockChange(Number(e.target.value) || 0, true)}
           value={stockRange[0] === 0 ? '' : stockRange[0]}
         />
-        <span className='text-gray-900'>-</span>
+        <span className="text-gray-900">-</span>
         <input
           type="number"
           placeholder="Max"
@@ -68,7 +78,7 @@ export const ProductFilters = ({
           value={stockRange[1] === Infinity ? '' : stockRange[1]}
         />
 
-        <span className="text-sm text-gray-700">Price:</span>
+        <span className="text-sm text-gray-700 ml-4">Price:</span>
         <input
           type="number"
           placeholder="Min"
@@ -76,7 +86,7 @@ export const ProductFilters = ({
           onChange={(e) => handlePriceChange(Number(e.target.value) || 0, true)}
           value={priceRange[0] === 0 ? '' : priceRange[0]}
         />
-        <span className='text-gray-900'>-</span>
+        <span className="text-gray-900">-</span>
         <input
           type="number"
           placeholder="Max"

@@ -7,23 +7,19 @@ import { Product } from '@/types/product'
 import axios from '@/lib/axios'
 import Swal from 'sweetalert2'
 
-export const TransactionFormTemplate = () => {
+interface TransactionFormTemplateProps {
+  shiftId: string
+}
+
+export const TransactionFormTemplate: React.FC<TransactionFormTemplateProps> = ({ shiftId }) => {
   const [products, setProducts] = useState<Product[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [token, setToken] = useState<string | null>(null)
-  const [shiftId, setShiftId] = useState<string | null>(null)
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token')
-    const savedShiftId = localStorage.getItem('shiftId')
-
-    if (!savedToken || !savedShiftId) {
-      console.warn('Missing token or shiftId in localStorage.')
-      return
-    }
-
+    if (!savedToken) return
     setToken(savedToken)
-    setShiftId(savedShiftId)
   }, [])
 
   useEffect(() => {
@@ -38,7 +34,6 @@ export const TransactionFormTemplate = () => {
         })
 
         const productData = res.data?.data
-
         if (Array.isArray(productData)) {
           setProducts(productData)
         } else {
@@ -54,10 +49,8 @@ export const TransactionFormTemplate = () => {
     fetchProducts()
   }, [token])
 
-  console.log(products)
-
   const handleSubmit = async (formData: TransactionInput) => {
-    if (!token || !shiftId) return
+    if (!token) return
 
     setIsSubmitting(true)
 
@@ -84,10 +77,6 @@ export const TransactionFormTemplate = () => {
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  if (!shiftId) {
-    return <p className="text-center text-red-500">Missing shift ID.</p>
   }
 
   return (

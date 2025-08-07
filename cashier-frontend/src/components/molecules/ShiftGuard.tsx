@@ -1,29 +1,38 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import toast from 'react-hot-toast';
 
 export const ShiftGuard = ({ children }: { children: React.ReactNode }) => {
-  const [hasShift, setHasShift] = useState<boolean | null>(null);
+  const params = useParams();
+  const router = useRouter();
+  const [isValid, setIsValid] = useState(false);
+  const [checked, setChecked] = useState(false);
 
   useEffect(() => {
-    const shiftId = localStorage.getItem('shiftId');
-    if (!shiftId) {
-      toast.error('Missing shift ID. Please start your shift first.');
-      setHasShift(false);
+    const shiftId = params?.id;
+
+    if (!shiftId || shiftId === 'null' || typeof shiftId !== 'string') {
+      toast.error('Please start your shift first.');
+      router.push('/cashier/shift');
       return;
     }
 
-    setHasShift(true);
-  }, []);
+    setIsValid(true);
+    setChecked(true);
+  }, [params, router]);
 
-  if (hasShift === null) {
-    return <div>Loading...</div>;
+  if (!checked) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="flex flex-col items-center gap-4">
+          <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
+          <p className="text-lg font-medium text-gray-600">Loading...</p>
+        </div>
+      </div>
+    );
   }
 
-  if (!hasShift) {
-    return <p className="text-center text-red-500">Missing shift ID.</p>;
-  }
-
-  return <>{children}</>;
+  return isValid ? <>{children}</> : null;
 };

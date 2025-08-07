@@ -3,7 +3,7 @@
 import React from 'react';
 import { Input } from '@/components/atomics/Input';
 import { Label } from '@/components/atomics/Label';
-import { Select } from '@/components/atomics/Select';
+import ReactSelect from 'react-select';
 
 interface PaymentSectionProps {
   paymentType: 'CASH' | 'DEBIT';
@@ -30,14 +30,21 @@ export const PaymentSection: React.FC<PaymentSectionProps> = ({
     <div className="space-y-4 mt-6">
       <div>
         <Label htmlFor="paymentType">Payment Method</Label>
-        <Select
-          value={paymentType}
-          onChange={(e) => onPaymentTypeChange(e.target.value as 'CASH' | 'DEBIT')}
+        <ReactSelect
+          className="text-black w-1/3 mt-4 border-black"
+          value={[
+            { value: 'CASH', label: 'Cash' },
+            { value: 'DEBIT', label: 'Debit' },
+          ].find((opt) => opt.value === paymentType) || null}
+          onChange={(option) => {
+            if (option) {
+              onPaymentTypeChange(option.value as 'CASH' | 'DEBIT');
+            }
+          }}
           options={[
             { value: 'CASH', label: 'Cash' },
             { value: 'DEBIT', label: 'Debit' },
           ]}
-          className="text-black"
         />
       </div>
 

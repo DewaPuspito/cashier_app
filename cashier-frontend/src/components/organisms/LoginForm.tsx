@@ -8,6 +8,7 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/useAuthStore';
 import { toast } from 'react-hot-toast';
 import { z } from 'zod';
+import ReactSelect from 'react-select';
 
 export const LoginForm = () => {
   const router = useRouter();
@@ -65,6 +66,11 @@ export const LoginForm = () => {
     </svg>
   );
 
+  const roleOptions = [
+    { value: 'admin', label: 'Admin' },
+    { value: 'cashier', label: 'Cashier' },
+  ];
+
   return (
     <div className="w-full max-w-md mx-auto mt-12 bg-white p-8 rounded-3xl shadow-lg">
       <div className="space-y-6">
@@ -101,16 +107,31 @@ export const LoginForm = () => {
           />
 
           <div className="space-y-2">
-            <label htmlFor="role" className="block text-sm font-medium text-gray-700">Login as</label>
-            <select
-              id="role"
-              value={role}
-              onChange={(e) => setRole(e.target.value as 'admin' | 'cashier')}
-              className="w-full border rounded-md px-3 py-2 text-sm text-gray-700"
-            >
-              <option value="admin">Admin</option>
-              <option value="cashier">Cashier</option>
-            </select>
+            <label htmlFor="role" className="block text-md font-medium text-gray-900">Login as</label>
+            <ReactSelect
+              value={roleOptions.find((opt) => opt.value === role)}
+              onChange={(option) => {
+                if (option) setRole(option.value as 'admin' | 'cashier');
+              }}
+              options={roleOptions}
+              className="w-full text-sm text-black border-black"
+              styles={{
+                control: (base) => ({
+                  ...base,
+                  borderRadius: '0.375rem',
+                  padding: '0.125rem 0.25rem',
+                  borderColor: '#d1d5db',
+                  boxShadow: 'none',
+                  '&:hover': {
+                    borderColor: '#9ca3af',
+                  },
+                }),
+                menu: (base) => ({
+                  ...base,
+                  zIndex: 20,
+                }),
+              }}
+            />
           </div>
         </div>
         <div className="flex justify-center">
