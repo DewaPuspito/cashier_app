@@ -11,14 +11,23 @@ export const Navbar = () => {
   const router = useRouter();
   const pathname = usePathname();
   const [hasHydrated, setHasHydrated] = useState(false);
+  const [isTransactionOpen, setIsTransactionOpen] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
 
   const { logout } = useAuthStore();
   const admin = useAuthStore((state) => state.admin);
   const cashier = useAuthStore((state) => state.cashier);
+  const activeShiftId = useAuthStore((state) => state.activeShiftId);
 
   useEffect(() => {
     setHasHydrated(true);
   }, []);
+
+  useEffect(() => {
+    if (hasHydrated) {
+      setIsLoading(false);
+    }
+  }, [hasHydrated]);
 
   useEffect(() => {
     if (!hasHydrated) return;
@@ -33,8 +42,8 @@ export const Navbar = () => {
   };
 
   const redirectPath = admin ? '/admin/reports' : '/cashier/shift';
-  const shiftIdMatch = pathname?.match(/\/cashier\/shift\/([^/]+)/);
-  const shiftId = shiftIdMatch ? shiftIdMatch[1] : null;
+
+  if (isLoading) return null;
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 w-full bg-teal-500 text-white px-6 py-4 shadow-md flex justify-between items-center">
@@ -64,14 +73,24 @@ export const Navbar = () => {
           </>
         )}
 
-        {cashier && (
-          <Link href={`/cashier/shift/${shiftId}/transaction`} className="hover:underline">
-            Transactions
-          </Link>
+        {cashier && activeShiftId && hasHydrated && (
+          <>
+            <Link 
+              href={`/cashier/shift/${activeShiftId}/transaction`}
+              className="hover:underline flex items-center gap-2"
+            >
+              New Transaction
+            </Link>
+            <Link 
+              href={`/cashier/shift/${activeShiftId}/transaction/history`}
+              className="hover:underline flex items-center gap-2"
+            >
+              Transaction History
+            </Link>
+          </>
         )}
 
-        <Button variant="danger" onClick={handleLogout} className="flex items-center gap-2">
-          <Image src="/globe.svg" alt="Logout Icon" width={20} height={20} />
+        <Button onClick={handleLogout} variant="danger">
           Logout
         </Button>
       </div>

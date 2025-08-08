@@ -22,5 +22,8 @@ export class ShiftRouter {
     this.router.patch("/shift/:id/end", AuthenticationMiddleware.verifyToken, AuthenticationMiddleware.checkCashierOwnership,
     AuthorizationMiddleware.allowCashier, ValidationMiddleware.validate({body: shiftSchema.body.partial(), params: shiftSchema.params}),
     this.ShiftController.endShift.bind(this.ShiftController));
+
+    this.router.get("/shift/active", AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowCashier, 
+    this.ShiftController.getActiveShift.bind(this.ShiftController));
   }
 }

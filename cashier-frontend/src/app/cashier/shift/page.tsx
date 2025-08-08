@@ -3,7 +3,7 @@ import { ShiftTemplate } from '@/components/templates/ShiftTemplate';
 
 export default function ShiftPage() {
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+    <div className="min-h-screen bg-gray-50 pt-14">
         <Navbar />
         <ShiftTemplate />
     </div>

@@ -29,4 +29,29 @@ export class ShiftController {
       res.status(400).json({ message: error.message || "Failed to end shift" });
     }
   }
+
+  async getActiveShift(req: RequestCollection, res: Response) {
+    try {
+      const cashierId = req.cashier?.id;
+      if (!cashierId) {
+        throw new Error("Unauthorized");
+      }
+  
+      const activeShift = await this.shiftService.getActiveShift(cashierId);
+      if (!activeShift) {
+        return res.status(404).json({
+          message: "No active shift found"
+        });
+      }
+  
+      return res.json({
+        message: "Active shift found",
+        data: activeShift
+      });
+    } catch (error: any) {
+      return res.status(500).json({
+        message: error.message || "Internal server error"
+      });
+    }
+  }
 }

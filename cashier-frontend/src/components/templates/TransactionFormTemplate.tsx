@@ -6,27 +6,35 @@ import { TransactionForm } from '@/components/organisms/TransactionForm'
 import { Product } from '@/types/product'
 import axios from '@/lib/axios'
 import Swal from 'sweetalert2'
-import { useRouter } from 'next/navigation'
+import { useRouter, useParams } from 'next/navigation'
+import { useAuthStore } from '@/stores/useAuthStore'
 
 export const TransactionFormTemplate = () => {
+  const params = useParams()
+  const activeShiftId = useAuthStore((state) => state.activeShiftId)
+  const shiftId = typeof params.id === 'string' ? params.id : params.id?.[0] || activeShiftId || ''
   const [products, setProducts] = useState<Product[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [token, setToken] = useState<string | null>(null)
-  const [shiftId, setShiftId] = useState<string | null>(null)
   const router = useRouter()
 
   useEffect(() => {
     const savedToken = localStorage.getItem('token')
-    const savedShiftId = localStorage.getItem('shiftId')
     
-    if (!savedToken || !savedShiftId) {
+    if (!savedToken) {
       router.push('/cashier/shift')
       return
     }
     
     setToken(savedToken)
-    setShiftId(savedShiftId)
   }, [])
+
+  useEffect(() => {
+    if (!shiftId) {
+      router.push('/cashier/shift')
+      return
+    }
+  }, [shiftId])
 
   useEffect(() => {
     if (!token) return
@@ -72,7 +80,7 @@ export const TransactionFormTemplate = () => {
         title: 'Transaction successful!',
       })
 
-      router.push(`/cashier/shift/${shiftId}/transaction/history`)
+      router.push(`/cashier/shift/${shiftId}/transaction`)
     } catch (error) {
       console.error(error)
       Swal.fire({

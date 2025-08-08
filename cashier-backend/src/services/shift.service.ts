@@ -44,4 +44,13 @@ export class ShiftService {
       },
     });
   }
+
+  async getActiveShift(cashierId: string) {
+    return await prisma.shift.findFirst({
+      where: {
+        cashierId,
+        endTime: null,
+      },
+    });
+  }
 }

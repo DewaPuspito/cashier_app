@@ -17,4 +17,23 @@ export type TransactionItemInput = {
     page?: number
     limit?: number
   }
+
+  export type TransactionDetail = {
+    id: string
+    amount: number
+    paymentType: string
+    createdAt: string
+    transactionItems: {
+        id: string
+        quantity: number
+        product: {
+            name: string
+            price: number
+        }
+    }[]
+    cashier: {
+        name: string
+        email: string
+    }
+}
   

@@ -57,7 +57,7 @@ export function TransactionHistory({ shiftId }: TransactionHistoryProps) {
 
   if (loading) {
     return (
-      <div className="flex justify-center items-center min-h-[400px]">
+      <div className="bg-white min-h-screen pt-32 px-6 pb-8 flex justify-center items-center">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500"></div>
       </div>
     )
@@ -91,52 +91,51 @@ export function TransactionHistory({ shiftId }: TransactionHistoryProps) {
   const currentTransactions = transactions.slice(startIndex, endIndex)
 
   return (
-    <div className="bg-white min-h-screen pt-24 px-6 pb-8">
+    <div className="bg-white min-h-screen pt-20 px-6 pb-8">
       <div className="text-center mb-8">
         <h2 className="text-2xl text-black font-semibold mb-2">Transaction List</h2>
       </div>
 
-      <div className="overflow-x-auto -mx-6">
-        <table className="w-full divide-y divide-gray-200">
-          <thead className="bg-white border-b border-gray-200">
+      <div className="overflow-x-auto border rounded-lg bg-white shadow">
+        <table className="min-w-full text-sm text-left text-gray-700">
+          <thead className="bg-gray-100 text-gray-900">
             <tr>
-              <th scope="col" className="w-[10%] px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">No</th>
-              <th scope="col" className="w-[25%] px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
-              <th scope="col" className="w-[20%] px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Payment</th>
-              <th scope="col" className="w-[25%] px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th scope="col" className="w-[20%] px-6 py-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+              <th className="px-4 py-2 text-center">NO</th>
+              <th className="px-4 py-2 text-center">AMOUNT</th>
+              <th className="px-4 py-2 text-center">PAYMENT</th>
+              <th className="px-4 py-2 text-center">DATE</th>
+              <th className="px-4 py-2 text-center">ACTIONS</th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {currentTransactions.map((transaction, index) => (
-              <tr key={transaction.id} className="hover:bg-gray-50">
-                <td className="px-6 py-5 whitespace-nowrap text-sm text-center text-gray-900">{startIndex + index + 1}</td>
-                <td className="px-6 py-5 whitespace-nowrap text-sm text-center text-gray-900">Rp {transaction.amount.toLocaleString()}</td>
-                <td className="px-6 py-5 whitespace-nowrap text-sm text-center">
-                  <span className={`inline-block px-2 py-1 text-xs font-semibold rounded-full ${transaction.paymentType.toLowerCase() === 'cash' ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'}`}>
-                    {transaction.paymentType}
-                  </span>
-                </td>
-                <td className="px-6 py-5 whitespace-nowrap text-sm text-center text-gray-900">
-                  {new Date(transaction.createdAt).toLocaleString('id-ID', {
-                    day: 'numeric',
-                    month: 'short',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                  })}
-                </td>
-                <td className="px-6 py-5 whitespace-nowrap text-sm text-center">
-                  <Button
-                    variant="tertiary"
-                    onClick={() => handleViewDetail(transaction.id)}
-                    className="text-sm px-4 py-2 w-28 mx-auto"
-                  >
-                    View Detail
-                  </Button>
+          <tbody className="divide-y divide-gray-200">
+            {currentTransactions.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="px-4 py-4 text-center text-gray-500">
+                  No data available
                 </td>
               </tr>
-            ))}
+            ) : (
+              currentTransactions.map((transaction, index) => (
+                <tr key={transaction.id}>
+                  <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">{startIndex + index + 1}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">Rp {transaction.amount.toLocaleString()}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">
+                    <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+                      {transaction.paymentType}
+                    </span>
+                  </td>
+                  <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">{new Date(transaction.createdAt).toLocaleString()}</td>
+                  <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">
+                    <Button
+                      variant="primary"
+                      onClick={() => handleViewDetail(transaction.id)}
+                    >
+                      View Detail
+                    </Button>
+                  </td>
+                </tr>
+              ))
+            )}
           </tbody>
         </table>
       </div>
