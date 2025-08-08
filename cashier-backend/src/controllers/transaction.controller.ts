@@ -37,7 +37,8 @@ export class TransactionController {
   async getDailyHistory(req: RequestCollection, res: Response) {
     try {
       const cashierId = req.cashier!.id;
-      const history = await this.transactionService.getDailyTransactions(cashierId);
+      const { shiftId } = req.params;
+      const history = await this.transactionService.getDailyTransactions(cashierId, shiftId);
       res.status(200).json({
         message: 'Transaction history',
         data: history,

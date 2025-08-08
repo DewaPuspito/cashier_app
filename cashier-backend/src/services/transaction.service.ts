@@ -87,19 +87,15 @@ export class TransactionService {
     });
   }
 
-  async getDailyTransactions(cashierId: string) {
+  async getDailyTransactions(cashierId: string, shiftId: string) {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
 
     return await prisma.transaction.findMany({
       where: {
         cashierId,
+        shiftId,
         createdAt: { gte: today }
-      },
-      include: {
-        transactionItems: {
-          include: { product: true }
-        }
       },
       orderBy: { createdAt: 'desc' }
     });
@@ -111,12 +107,6 @@ export class TransactionService {
         id: id 
       },
       include: {
-        cashier: {
-          select: {
-            name: true,
-            email: true
-          }
-        },
         transactionItems: {
           include: {
             product: {
