@@ -72,7 +72,7 @@ export const TransactionFormTemplate = () => {
         title: 'Transaction successful!',
       })
 
-      router.push('/cashier/history')
+      router.push(`/cashier/shift/${shiftId}/transaction/history`)
     } catch (error) {
       console.error(error)
       Swal.fire({

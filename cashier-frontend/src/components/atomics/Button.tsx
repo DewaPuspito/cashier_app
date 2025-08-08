@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: 'primary' | 'secondary' | 'danger';
+  variant?: 'primary' | 'secondary' | 'tertiary' | 'danger';
 }
 
 export const Button: React.FC<ButtonProps> = ({ variant = 'primary', children, className = '', ...props }) => {
@@ -9,6 +9,7 @@ export const Button: React.FC<ButtonProps> = ({ variant = 'primary', children, c
   const variants = {
     primary: 'bg-green-600 text-white hover:bg-green-700',
     secondary: 'bg-yellow-400 text-black hover:bg-yellow-500',
+    tertiary: 'bg-blue-600 text-white hover:bg-blue-700',
     danger: 'bg-red-600 text-white hover:bg-red-700',
   };
 
