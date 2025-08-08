@@ -21,5 +21,8 @@ export class TransactionRouter {
 
     this.router.get('/shift/:shiftId/transactions/history', AuthenticationMiddleware.verifyToken, AuthorizationMiddleware.allowCashier,
     this.transactionController.getDailyHistory.bind(this.transactionController));
+
+    this.router.get('/shift/:shiftId/transactions/:transactionId/transaction-detail', AuthenticationMiddleware.verifyToken, 
+    AuthorizationMiddleware.allowCashier, this.transactionController.getTransactionById.bind(this.transactionController));
   }
 }

@@ -104,4 +104,37 @@ export class TransactionService {
       orderBy: { createdAt: 'desc' }
     });
   }
+
+  async getTransactionDetailPerShift(id: string) {
+    const transaction = await prisma.transaction.findUnique({
+      where: { 
+        id: id 
+      },
+      include: {
+        cashier: {
+          select: {
+            name: true,
+            email: true
+          }
+        },
+        transactionItems: {
+          include: {
+            product: {
+              select: {
+                name: true,
+                price: true,
+                category: true
+              }
+            }
+          }
+        }
+      }
+    })
+    
+    if (!transaction) {
+      throw new Error('Transaction not found')
+    }
+    
+    return transaction
+  }
 }

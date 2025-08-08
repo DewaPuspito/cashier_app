@@ -48,4 +48,20 @@ export class TransactionController {
       });
     }
   }
+
+  async getTransactionById(req: RequestCollection, res: Response) {
+    try {
+      const { transactionId } = req.params;
+      const transaction = await this.transactionService.getTransactionDetailPerShift(transactionId);
+      
+      res.status(200).json({
+        message: 'Transaction found',
+        data: transaction
+      });
+    } catch (error: any) {
+      res.status(error.message === 'Transaction not found' ? 404 : 500).json({
+        message: error.message || 'Failed to fetch transaction'
+      });
+    }
+  }
 }
