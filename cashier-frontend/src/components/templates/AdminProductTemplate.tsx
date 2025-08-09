@@ -127,9 +127,22 @@ export const AdminProductTemplate = () => {
       </SearchBar>
 
       <ProductFilters
-        categoryOptions={products.map(p => p.category).filter((value, index, self) => self.indexOf(value) === index)}
+        categoryOptions={products
+          .map(p => p.category)
+          .filter((value, index, self) => self.indexOf(value) === index)
+          .map(category => {
+            return category
+              .toLowerCase()
+              .split('_')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join('');
+          })}
         onCategoryChange={(cat) => {
-          setCategory(cat);
+          const originalFormat = cat
+            .split(/(?=[A-Z])/)
+            .join('_')
+            .toUpperCase();
+          setCategory(originalFormat);
           setCurrentPage(1);
         }}
         onStockRangeChange={(range) => {
