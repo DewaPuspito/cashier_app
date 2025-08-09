@@ -8,36 +8,33 @@ type ProductCategory = 'FRUITS' | 'VEGETABLES' | 'CANNED_GOODS' | 'DAIRY' | 'MEA
 
 export class ProductService {
   async findAllProduct(query: ProductQuery) {
-    const {search, price, stock, category, page = 1, limit = 20} = query
-
-    const where : Prisma.ProductWhereInput = {
+    const { search, price, stock, category, page = 1, limit = 20 } = query;
+  
+    const where: Prisma.ProductWhereInput = {
       isDeleted: false
-    }
-
+    };
+  
     if (search) {
-        where.name = { contains: search, mode: 'insensitive' };
+      where.name = { contains: search, mode: 'insensitive' };
     }
-
-    if (price) {
-      where.price = price
-    }
-
-    if (stock) {
-        where.stock = stock;
-    }
-
+    if (price) where.price = price;
+    if (stock) where.stock = stock;
     if (category) {
-        where.category = {
-          equals: category as ProductCategory
-        };
+      where.category = { equals: category as ProductCategory };
     }
-
-    return prisma.product.findMany({
+  
+    const [data, total] = await Promise.all([
+      prisma.product.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit
-    }) 
+      }),
+      prisma.product.count({ where })
+    ]);
+  
+    return { data, total };
   }
+  
 
   async findProductDetail(id: string) {
     return await prisma.product.findUnique({ 

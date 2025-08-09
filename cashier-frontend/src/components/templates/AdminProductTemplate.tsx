@@ -12,14 +12,18 @@ import Swal from 'sweetalert2';
 
 export const AdminProductTemplate = () => {
   const [products, setProducts] = useState<Product[]>([]);
-  const [filtered, setFiltered] = useState<Product[]>([]);
+  const [total, setTotal] = useState(0);
+
   const [category, setCategory] = useState('');
   const [stockRange, setStockRange] = useState<[number, number]>([0, Infinity]);
   const [priceRange, setPriceRange] = useState<[number, number]>([0, Infinity]);
+  const [searchQuery, setSearchQuery] = useState('');
+
   const [token, setToken] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 20;
 
+  // Ambil token
   useEffect(() => {
     const savedToken = localStorage.getItem('token');
     if (!savedToken) {
@@ -29,41 +33,51 @@ export const AdminProductTemplate = () => {
     setToken(savedToken);
   }, []);
 
+  // Fetch products per halaman + filter
+  const fetchProducts = async () => {
+    try {
+      const params: any = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchQuery || undefined,
+        category: category || undefined,
+      };
+
+      // Range stock & price hanya dikirim kalau user isi filter
+      if (stockRange[0] !== 0 || stockRange[1] !== Infinity) {
+        params.stockMin = stockRange[0];
+        params.stockMax = stockRange[1];
+      }
+      if (priceRange[0] !== 0 || priceRange[1] !== Infinity) {
+        params.priceMin = priceRange[0];
+        params.priceMax = priceRange[1];
+      }
+
+      const res = await axios.get('/products', {
+        headers: { Authorization: `Bearer ${token}` },
+        params,
+      });
+
+      setProducts(res.data.data || []);
+      setTotal(res.data.total || 0);
+    } catch (err) {
+      console.error('Failed to fetch products:', err);
+      setProducts([]);
+      setTotal(0);
+    }
+  };
+
   useEffect(() => {
     if (!token) return;
-
-    const fetchProducts = async () => {
-      try {
-        const res = await axios.get('/products', {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        const productData = res.data?.data;
-
-        if (Array.isArray(productData)) {
-          setProducts(productData);
-          setFiltered(productData);
-        } else {
-          console.warn('Expected array at res.data.data but got:', res.data);
-          setProducts([]);
-          setFiltered([]);
-        }
-      } catch (err) {
-        console.error('Failed to fetch products:', err);
-        setProducts([]);
-        setFiltered([]);
-      }
-    };
-
     fetchProducts();
-  }, [token]);
+  }, [token, currentPage, searchQuery, category, stockRange, priceRange]);
 
+  // Edit product
   const handleEdit = (product: Product) => {
     window.location.href = `/admin/products/${product.id}/edit-product`;
   };
 
+  // Delete product
   const handleDelete = async (productId: string) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
@@ -73,27 +87,18 @@ export const AdminProductTemplate = () => {
       confirmButtonColor: '#3085d6',
       cancelButtonColor: '#d33',
       confirmButtonText: 'Yes',
-      cancelButtonText: 'Cancel'
+      cancelButtonText: 'Cancel',
     });
 
     if (!result.isConfirmed) return;
 
     try {
       await axios.delete(`/products/${productId}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
 
-      const updated = products.filter((p) => p.id !== productId);
-      setProducts(updated);
-      setFiltered(updated);
-
-      Swal.fire(
-        'Deleted!',
-        'Product data has been deleted.',
-        'success'
-      );
+      Swal.fire('Deleted!', 'Product data has been deleted.', 'success');
+      fetchProducts(); // refresh list
     } catch (err) {
       console.error('Failed to delete product:', err);
       Swal.fire(
@@ -102,46 +107,9 @@ export const AdminProductTemplate = () => {
         'error'
       );
     }
-  }
-
-  const handleSearch = (query: string) => {
-    const result = products.filter((p) =>
-      p.name.toLowerCase().includes(query.toLowerCase())
-    );
-    setFiltered(result);
   };
 
-  const handleCategory = (cat: string) => {
-    setCategory(cat);
-  };
-
-  const handleStockRange = (range: [number, number]) => {
-    setStockRange(range);
-  };
-
-  const handlePriceRange = (range: [number, number]) => {
-    setPriceRange(range);
-  };
-
-  const finalFiltered =
-    Array.isArray(filtered) &&
-    filtered.filter(
-      (p) =>
-        (category === '' || p.category === category) &&
-        p.stock >= stockRange[0] &&
-        p.stock <= stockRange[1] &&
-        p.price >= priceRange[0] &&
-        p.price <= priceRange[1]
-    );
-
-    const totalPages = Math.ceil(filtered.length / itemsPerPage);
-    const startIndex = (currentPage - 1) * itemsPerPage;
-    const endIndex = startIndex + itemsPerPage;
-    const currentProducts = filtered.slice(startIndex, endIndex);
-
-    const handlePageChange = (page: number) => {
-      setCurrentPage(page);
-    };
+  const totalPages = Math.ceil(total / itemsPerPage);
 
   return (
     <section className="px-8 py-6 min-h-screen bg-gray-50">
@@ -149,36 +117,51 @@ export const AdminProductTemplate = () => {
         <h1 className="text-3xl font-bold text-gray-900 text-center">Products</h1>
       </div>
 
-      <SearchBar onSearch={handleSearch} context="product" >
-      <Button variant="primary" onClick={() => window.location.href = '/admin/products/create-product'}>Add Product</Button>
+      <SearchBar onSearch={setSearchQuery} context="product">
+        <Button
+          variant="primary"
+          onClick={() => (window.location.href = '/admin/products/create-product')}
+        >
+          Add Product
+        </Button>
       </SearchBar>
+
       <ProductFilters
-        categoryOptions={[...new Set(products.map((p) => p.category))]}
-        onCategoryChange={handleCategory}
-        onStockRangeChange={handleStockRange}
-        onPriceRangeChange={handlePriceRange}
+        categoryOptions={products.map(p => p.category).filter((value, index, self) => self.indexOf(value) === index)}
+        onCategoryChange={(cat) => {
+          setCategory(cat);
+          setCurrentPage(1);
+        }}
+        onStockRangeChange={(range) => {
+          setStockRange(range);
+          setCurrentPage(1);
+        }}
+        onPriceRangeChange={(range) => {
+          setPriceRange(range);
+          setCurrentPage(1);
+        }}
       />
 
-        {Array.isArray(finalFiltered) && finalFiltered.length === 0 ? (
+      {Array.isArray(products) && products.length === 0 ? (
         <p className="text-gray-500">No products found.</p>
-        ) : (
+      ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-            {Array.isArray(finalFiltered) &&
-              finalFiltered.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  product={product}
-                  onEdit={handleEdit}
-                  onDelete={handleDelete}
-                />
-            ))}
+          {products.map((product) => (
+            <ProductCard
+              key={product.id}
+              product={product}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+            />
+          ))}
         </div>
-        )}
-        <PaginationControls
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
+      )}
+
+      <PaginationControls
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={setCurrentPage}
+      />
     </section>
   );
 };
