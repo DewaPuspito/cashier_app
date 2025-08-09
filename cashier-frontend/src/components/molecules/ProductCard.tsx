@@ -11,6 +11,14 @@ interface Props {
 export const ProductCard = ({ product, onEdit, onDelete }: Props) => {
   const { name, category, stock, imageUrl, price, id } = product;
 
+  const formatCategory = (category: string) => {
+    return category
+      .toLowerCase()
+      .split('_')
+      .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+      .join(' ');
+  };
+
   return (
     <div className="bg-white shadow rounded-lg overflow-hidden flex flex-col h-full">
       <Image
@@ -25,7 +33,7 @@ export const ProductCard = ({ product, onEdit, onDelete }: Props) => {
       />
       <div className="p-4 flex flex-col flex-1">
         <h3 className="text-lg font-semibold text-gray-800">{name}</h3>
-        <p className="text-sm text-gray-500">{category}</p>
+        <p className="text-sm text-gray-500">{formatCategory(category)}</p>
         <p className="text-sm text-gray-500">Stock: {stock}</p>
         <p className="mt-auto text-blue-600 text-lg font-bold mt-2">
           Rp {price.toLocaleString()}

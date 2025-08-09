@@ -41,7 +41,10 @@ export const ProductFilters = ({
 
   const categoryOptionsFormatted = [
     { value: '', label: 'All Categories' },
-    ...categoryOptions.map((cat) => ({ value: cat, label: cat })),
+    ...categoryOptions.map((cat) => ({
+      value: cat,
+      label: cat.split(/(?=[A-Z])/).join(' ')
+    })),
   ];
 
   return (
