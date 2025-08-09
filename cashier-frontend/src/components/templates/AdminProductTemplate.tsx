@@ -18,7 +18,6 @@ export const AdminProductTemplate = () => {
   const [priceRange, setPriceRange] = useState<[number, number]>([0, Infinity]);
   const [token, setToken] = useState<string | null>(null);
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 20;
 
   useEffect(() => {
@@ -39,35 +38,27 @@ export const AdminProductTemplate = () => {
           headers: {
             Authorization: `Bearer ${token}`,
           },
-          params: {
-            page: currentPage,
-            limit: itemsPerPage
-          }
         });
 
-        console.log('API Response:', res.data);
+        const productData = res.data?.data;
 
-        if (res.data?.data?.data) {
-          setProducts(res.data.data.data);
-          setFiltered(res.data.data.data);
-          setTotalPages(res.data.data.totalPages || 1);
+        if (Array.isArray(productData)) {
+          setProducts(productData);
+          setFiltered(productData);
         } else {
-          console.warn('No data in response:', res.data);
+          console.warn('Expected array at res.data.data but got:', res.data);
           setProducts([]);
           setFiltered([]);
-          setTotalPages(1);
         }
       } catch (err) {
         console.error('Failed to fetch products:', err);
         setProducts([]);
         setFiltered([]);
-        setTotalPages(1);
       }
     };
 
     fetchProducts();
-  }, [token, currentPage]);
-
+  }, [token]);
 
   const handleEdit = (product: Product) => {
     window.location.href = `/admin/products/${product.id}/edit-product`;
@@ -114,10 +105,6 @@ export const AdminProductTemplate = () => {
   }
 
   const handleSearch = (query: string) => {
-    if (!Array.isArray(products)) {
-      setFiltered([]);
-      return;
-    }
     const result = products.filter((p) =>
       p.name.toLowerCase().includes(query.toLowerCase())
     );
@@ -147,9 +134,14 @@ export const AdminProductTemplate = () => {
         p.price <= priceRange[1]
     );
 
-  const handlePageChange = (page: number) => {
-    setCurrentPage(page);
-  };
+    const totalPages = Math.ceil(filtered.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentProducts = filtered.slice(startIndex, endIndex);
+
+    const handlePageChange = (page: number) => {
+      setCurrentPage(page);
+    };
 
   return (
     <section className="px-8 py-6 min-h-screen bg-gray-50">
@@ -158,34 +150,35 @@ export const AdminProductTemplate = () => {
       </div>
 
       <SearchBar onSearch={handleSearch} context="product" >
-        <Button variant="primary" onClick={() => window.location.href = '/admin/products/create-product'}>Add Product</Button>
+      <Button variant="primary" onClick={() => window.location.href = '/admin/products/create-product'}>Add Product</Button>
       </SearchBar>
       <ProductFilters
-        categoryOptions={Array.isArray(products) ? [...new Set(products.map((p) => p.category))] : []}
+        categoryOptions={[...new Set(products.map((p) => p.category))]}
         onCategoryChange={handleCategory}
         onStockRangeChange={handleStockRange}
         onPriceRangeChange={handlePriceRange}
       />
 
-      {!Array.isArray(filtered) || filtered.length === 0 ? (
+        {Array.isArray(finalFiltered) && finalFiltered.length === 0 ? (
         <p className="text-gray-500">No products found.</p>
-      ) : (
+        ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {filtered.map((product) => (
-            <ProductCard
-              key={product.id}
-              product={product}
-              onEdit={handleEdit}
-              onDelete={handleDelete}
-            />
-          ))}
+            {Array.isArray(finalFiltered) &&
+              finalFiltered.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  onEdit={handleEdit}
+                  onDelete={handleDelete}
+                />
+            ))}
         </div>
-      )}
-      <PaginationControls
-        currentPage={currentPage}
-        totalPages={totalPages}
-        onPageChange={handlePageChange}
-      />
+        )}
+        <PaginationControls
+          currentPage={currentPage}
+          totalPages={totalPages}
+          onPageChange={handlePageChange}
+        />
     </section>
   );
 };

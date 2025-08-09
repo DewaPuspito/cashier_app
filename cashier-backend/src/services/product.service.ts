@@ -32,22 +32,11 @@ export class ProductService {
         };
     }
 
-    const [data, total] = await Promise.all([
-      prisma.product.findMany({
+    return prisma.product.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit
-      }),
-      prisma.product.count({ where })
-    ]);
-
-    return {
-      data,
-      total,
-      page,
-      limit,
-      totalPages: Math.ceil(total / limit)
-    }
+    }) 
   }
 
   async findProductDetail(id: string) {
