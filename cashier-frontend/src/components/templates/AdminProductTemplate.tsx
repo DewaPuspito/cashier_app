@@ -12,6 +12,8 @@ import Swal from 'sweetalert2';
 
 export const AdminProductTemplate = () => {
   const [products, setProducts] = useState<Product[]>([]);
+  const [filteredProducts, setFilteredProducts] = useState<Product[]>([]);
+  const [displayedProducts, setDisplayedProducts] = useState<Product[]>([]);
   const [total, setTotal] = useState(0);
 
   const [category, setCategory] = useState('');
@@ -33,44 +35,69 @@ export const AdminProductTemplate = () => {
     setToken(savedToken);
   }, []);
 
-  // Fetch products per halaman + filter
+  // Fetch all products without pagination
   const fetchProducts = async () => {
     try {
-      const params: any = {
-        page: currentPage,
-        limit: itemsPerPage,
-        search: searchQuery || undefined,
-        category: category || undefined,
-      };
-
-      // Range stock & price hanya dikirim kalau user isi filter
-      if (stockRange[0] !== 0 || stockRange[1] !== Infinity) {
-        params.stockMin = stockRange[0];
-        params.stockMax = stockRange[1];
-      }
-      if (priceRange[0] !== 0 || priceRange[1] !== Infinity) {
-        params.priceMin = priceRange[0];
-        params.priceMax = priceRange[1];
-      }
-
       const res = await axios.get('/products', {
         headers: { Authorization: `Bearer ${token}` },
-        params,
+        params: {
+          search: searchQuery || undefined,
+          limit: 1000 // Get all products
+        },
       });
 
       setProducts(res.data.data || []);
-      setTotal(res.data.total || 0);
     } catch (err) {
       console.error('Failed to fetch products:', err);
       setProducts([]);
-      setTotal(0);
     }
   };
+
+  // Apply filters whenever products or filter criteria change
+  useEffect(() => {
+    let filtered = [...products];
+
+    // Apply category filter
+    if (category) {
+      filtered = filtered.filter(product => product.category === category);
+    }
+
+    // Apply stock range filter
+    if (stockRange[0] !== 0 || stockRange[1] !== Infinity) {
+      filtered = filtered.filter(
+        product => 
+          product.stock >= stockRange[0] && 
+          (stockRange[1] === Infinity || product.stock <= stockRange[1])
+      );
+    }
+
+    // Apply price range filter
+    if (priceRange[0] !== 0 || priceRange[1] !== Infinity) {
+      filtered = filtered.filter(
+        product => 
+          product.price >= priceRange[0] && 
+          (priceRange[1] === Infinity || product.price <= priceRange[1])
+      );
+    }
+
+    setFilteredProducts(filtered);
+    setTotal(filtered.length);
+    
+    // Reset to first page when filters change
+    setCurrentPage(1);
+  }, [products, category, stockRange, priceRange]);
+
+  // Apply pagination to filtered products
+  useEffect(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    setDisplayedProducts(filteredProducts.slice(startIndex, endIndex));
+  }, [filteredProducts, currentPage]);
 
   useEffect(() => {
     if (!token) return;
     fetchProducts();
-  }, [token, currentPage, searchQuery, category, stockRange, priceRange]);
+  }, [token, searchQuery]);
 
   // Edit product
   const handleEdit = (product: Product) => {
@@ -109,8 +136,6 @@ export const AdminProductTemplate = () => {
     }
   };
 
-  const totalPages = Math.ceil(total / itemsPerPage);
-
   return (
     <section className="px-8 py-6 min-h-screen bg-gray-50">
       <div className="max-w-7xl mx-auto space-y-6 px-6 py-8">
@@ -143,23 +168,20 @@ export const AdminProductTemplate = () => {
             .join('_')
             .toUpperCase();
           setCategory(originalFormat);
-          setCurrentPage(1);
         }}
         onStockRangeChange={(range) => {
-          setStockRange(range);
-          setCurrentPage(1);
+          setStockRange([Number(range[0]), Number(range[1])]);
         }}
         onPriceRangeChange={(range) => {
-          setPriceRange(range);
-          setCurrentPage(1);
+          setPriceRange([Number(range[0]), Number(range[1])]);
         }}
       />
 
-      {Array.isArray(products) && products.length === 0 ? (
+      {displayedProducts.length === 0 ? (
         <p className="text-gray-500">No products found.</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
+          {displayedProducts.map((product) => (
             <ProductCard
               key={product.id}
               product={product}
@@ -172,7 +194,7 @@ export const AdminProductTemplate = () => {
 
       <PaginationControls
         currentPage={currentPage}
-        totalPages={totalPages}
+        totalPages={Math.ceil(total / itemsPerPage)}
         onPageChange={setCurrentPage}
       />
     </section>
