@@ -22,8 +22,8 @@ export const SummaryTable: React.FC<Props> = ({ data }) => {
         <tbody>
           <tr>
             <td className="px-4 py-2 text-center">{data.totalTransactions}</td>
-            <td className="px-4 py-2 text-center">Rp {data.totalDebit.toLocaleString()}</td>
-            <td className="px-4 py-2 text-center">Rp {data.totalDebit.toLocaleString()}</td>
+            <td className="px-4 py-2 text-center">Rp {data.totalIncome.toLocaleString()}</td>
+            <td className="px-4 py-2 text-center">Rp {data.totalCash.toLocaleString()}</td>
             <td className="px-4 py-2 text-center">Rp {data.totalDebit.toLocaleString()}</td>
           </tr>
         </tbody>

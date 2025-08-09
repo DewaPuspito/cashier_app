@@ -41,7 +41,9 @@ export interface ShiftStartInput {
     name: string;
     price: number;
     stock: number;
-    category: 'FOOD' | 'DRINK' | 'CLOTHING' | 'ELECTRONICS' | 'HEALTH' | 'STATIONERY'
+    category: 'FRUITS' | 'VEGETABLES' | 'CANNED_GOODS' | 'DAIRY' | 'MEAT' | 'SEAFOOD' | 'DELI' | 'CONDIMENTS_SPICES' | 'SNACKS' | 
+    'BREAD_AND_BAKERY' | 'BEVERAGES' | 'PASTA_RICE_CEREAL' | 'BAKING' | 'FROZEN_FOODS' | 'PERSONAL_CARE' | 'HEALTH_CARE' | 'HOUSEHOLD' |
+    'BABY_ITEMS' | 'PET_SUPPLIES' | 'AUTOMOTIVE' | 'ELECTRONICS' | 'SPORTS_OUTDOORS' | 'TOYS' | 'STATIONERIES' | 'CLOTHING'
     imageUrl: string;
   }
   
@@ -49,7 +51,9 @@ export interface ShiftStartInput {
     search?: string;
     price?: number;
     stock?: number;
-    category?: 'FOOD' | 'DRINK' | 'CLOTHING' | 'ELECTRONICS' | 'HEALTH' | 'STATIONERY'
+    category?: 'FRUITS' | 'VEGETABLES' | 'CANNED_GOODS' | 'DAIRY' | 'MEAT' | 'SEAFOOD' | 'DELI' | 'CONDIMENTS_SPICES' | 'SNACKS' | 
+    'BREAD_AND_BAKERY' | 'BEVERAGES' | 'PASTA_RICE_CEREAL' | 'BAKING' | 'FROZEN_FOODS' | 'PERSONAL_CARE' | 'HEALTH_CARE' | 'HOUSEHOLD' |
+    'BABY_ITEMS' | 'PET_SUPPLIES' | 'AUTOMOTIVE' | 'ELECTRONICS' | 'SPORTS_OUTDOORS' | 'TOYS' | 'STATIONERIES' | 'CLOTHING'
     imageUrl?: string;
     page?: number;
     limit?: number;

@@ -5,10 +5,8 @@ import { AuthPayload, AdminPayload, CashierPayload } from "../models/interface";
 
 export class authService {
   public async login(email: string, password: string, role: 'admin' | 'cashier') {
-    console.log("[DEBUG] Login attempt:", { email, role });
 
     if (role !== 'admin' && role !== 'cashier') {
-      console.log("[DEBUG] Invalid role provided:", role);
       throw new Error("Invalid role: must be 'admin' or 'cashier'");
     }
 
@@ -21,15 +19,11 @@ export class authService {
         });
 
     if (!user) {
-      console.log("[DEBUG] User not found for:", { email, role });
       throw new Error("Invalid email or password");
     }
 
-    console.log("[DEBUG] Found user:", { id: user.id, name: user.name, email: user.email });
-
     const isValid = await bcrypt.compare(password, user.password);
     if (!isValid) {
-      console.log("[DEBUG] Password mismatch for:", email);
       throw new Error("Invalid email or password");
     }
 
@@ -48,8 +42,6 @@ export class authService {
         } as CashierPayload;
 
     const token = JwtUtils.generateToken(payload);
-
-    console.log("[DEBUG] Login success:", { id: user.id, role });
 
     return {
       id: user.id,

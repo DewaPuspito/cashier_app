@@ -71,7 +71,11 @@ export const AdminReportTemplate = () => {
         )}
 
         <h2 className="text-xl font-bold text-gray-900 text-center mt-8">Daily Shifts</h2>
-        <ReportTable data={shiftReports} />
+        <ReportTable 
+          data={shiftReports}
+          page={pageShift}
+          limit={10}
+        />
         <PaginationControls
           currentPage={pageShift}
           totalPages={totalPagesShift}

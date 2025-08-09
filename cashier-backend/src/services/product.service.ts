@@ -2,7 +2,9 @@ import { prisma } from "../prisma/client";
 import { Prisma } from "@prisma/client";
 import { ProductInput, ProductQuery } from "../models/interface";
 
-type ProductCategory = 'FOOD' | 'DRINK' | 'CLOTHING' | 'ELECTRONICS' | 'HEALTH' | 'STATIONERY'
+type ProductCategory = 'FRUITS' | 'VEGETABLES' | 'CANNED_GOODS' | 'DAIRY' | 'MEAT' | 'SEAFOOD' | 'DELI' | 'CONDIMENTS_SPICES' | 'SNACKS' | 
+    'BREAD_AND_BAKERY' | 'BEVERAGES' | 'PASTA_RICE_CEREAL' | 'BAKING' | 'FROZEN_FOODS' | 'PERSONAL_CARE' | 'HEALTH_CARE' | 'HOUSEHOLD' |
+    'BABY_ITEMS' | 'PET_SUPPLIES' | 'AUTOMOTIVE' | 'ELECTRONICS' | 'SPORTS_OUTDOORS' | 'TOYS' | 'STATIONERIES' | 'CLOTHING'
 
 export class ProductService {
   async findAllProduct(query: ProductQuery) {
@@ -30,11 +32,22 @@ export class ProductService {
         };
     }
 
-    return prisma.product.findMany({
+    const [data, total] = await Promise.all([
+      prisma.product.findMany({
         where,
         skip: (page - 1) * limit,
         take: limit
-    }) 
+      }),
+      prisma.product.count({ where })
+    ]);
+
+    return {
+      data,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    }
   }
 
   async findProductDetail(id: string) {

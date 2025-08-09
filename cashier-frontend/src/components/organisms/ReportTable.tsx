@@ -4,9 +4,12 @@ import { ShiftReport } from "@/types/report";
 
 type ReportTableProps = {
   data: ShiftReport[];
+  page: number;
+  limit: number;
 };
 
-export const ReportTable = ({ data }: ReportTableProps) => {
+
+export const ReportTable = ({ data, page, limit }: ReportTableProps) => {
   return (
     <div className="overflow-x-auto border rounded-lg bg-white shadow">
       <table className="min-w-full text-sm text-left text-gray-700">
@@ -33,7 +36,9 @@ export const ReportTable = ({ data }: ReportTableProps) => {
           ) : (
             data.map((report, i) => (
               <tr key={report.shiftId}>
-                <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">{i + 1}</td>
+                <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">
+                  {(page - 1) * limit + i + 1}
+                </td>
                 <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">{report.cashier.name}</td>
                 <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">Rp {(report.startCash || 0).toLocaleString()}</td>
                 <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">Rp {(report.endCash || 0).toLocaleString()}</td>
