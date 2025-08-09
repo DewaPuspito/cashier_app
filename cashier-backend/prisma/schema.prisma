@@ -13,6 +13,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+generator erd {
+  provider = "prisma-erd-generator"
+  output = "../ERD.png"
+}
+
+
 model Admin {
   id           String        @id @default(uuid())
   name         String

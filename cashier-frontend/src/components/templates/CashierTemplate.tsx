@@ -138,14 +138,15 @@ export const AdminCashierTemplate = () => {
         <h2 className="text-3xl font-bold text-gray-900 text-center">Cashiers</h2>
 
         <div className="space-y-4">
-        <SearchBar onSearch={(query: string) => setSearchTerm(query)} />
+          <SearchBar onSearch={(query: string) => setSearchTerm(query)}>
             <Button 
-              variant="primary" 
-              onClick={() => router.push('/admin/cashier/create-cashier')} 
-              className="px-3 py-1 text-sm border text-green-600 hover:bg-green-700 rounded-lg"
-            >
-              + Add Cashier
-            </Button>
+                variant="primary" 
+                onClick={() => router.push('/admin/cashier/create-cashier')} 
+                className="px-3 py-1 text-sm border text-green-600 hover:bg-green-700 rounded-lg"
+              >
+                + Add Cashier
+              </Button>
+          </SearchBar>
 
           <CashierTable
             data={cashiers}

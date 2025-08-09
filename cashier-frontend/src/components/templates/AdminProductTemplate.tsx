@@ -147,7 +147,7 @@ export const AdminProductTemplate = () => {
           variant="primary"
           onClick={() => (window.location.href = '/admin/products/create-product')}
         >
-          Add Product
+          + Add Product
         </Button>
       </SearchBar>
 
