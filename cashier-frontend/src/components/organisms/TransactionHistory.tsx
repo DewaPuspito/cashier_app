@@ -97,41 +97,43 @@ export function TransactionHistory({ shiftId }: TransactionHistoryProps) {
       </div>
 
       <div className="overflow-x-auto border rounded-lg bg-white shadow">
-        <table className="min-w-full text-sm text-left text-gray-700">
+        <table className="min-w-full text-sm text-gray-700">
           <thead className="bg-gray-100 text-gray-900">
-            <tr>
-              <th className="px-4 py-2 text-center">NO</th>
-              <th className="px-4 py-2 text-center">AMOUNT</th>
-              <th className="px-4 py-2 text-center">PAYMENT</th>
-              <th className="px-4 py-2 text-center">DATE</th>
-              <th className="px-4 py-2 text-center">ACTIONS</th>
+            <tr className="text-center">
+              <th className="px-4 py-2 align-middle">No</th>
+              <th className="px-4 py-2 align-middle">Amount</th>
+              <th className="px-4 py-2 align-middle">Payment</th>
+              <th className="px-4 py-2 align-middle">Date</th>
+              <th className="px-4 py-2 align-middle">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200">
             {currentTransactions.length === 0 ? (
               <tr>
-                <td colSpan={5} className="px-4 py-4 text-center text-gray-500">
+                <td colSpan={5} className="px-4 py-4 text-center align-middle text-gray-500">
                   No data available
                 </td>
               </tr>
             ) : (
               currentTransactions.map((transaction, index) => (
-                <tr key={transaction.id}>
-                  <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">{startIndex + index + 1}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">Rp {transaction.amount.toLocaleString()}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">
+                <tr key={transaction.id} className="text-center">
+                  <td className="whitespace-nowrap px-4 py-3 align-middle text-gray-700">{startIndex + index + 1}</td>
+                  <td className="whitespace-nowrap px-4 py-3 align-middle text-gray-700">Rp {transaction.amount.toLocaleString()}</td>
+                  <td className="whitespace-nowrap px-4 py-3 align-middle text-gray-700">
                     <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
                       {transaction.paymentType}
                     </span>
                   </td>
-                  <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">{new Date(transaction.createdAt).toLocaleString()}</td>
-                  <td className="whitespace-nowrap px-4 py-3 text-center text-gray-700">
-                    <Button
-                      variant="primary"
-                      onClick={() => handleViewDetail(transaction.id)}
-                    >
-                      View Detail
-                    </Button>
+                  <td className="whitespace-nowrap px-4 py-3 align-middle text-gray-700">{new Date(transaction.createdAt).toLocaleString()}</td>
+                  <td className="whitespace-nowrap px-4 py-3 align-middle text-gray-700">
+                    <div className="flex justify-center">
+                      <Button
+                        variant="tertiary"
+                        onClick={() => handleViewDetail(transaction.id)}
+                      >
+                        View Detail
+                      </Button>
+                    </div>
                   </td>
                 </tr>
               ))

@@ -76,9 +76,9 @@ export function TransactionDetail({ shiftId, transactionId }: TransactionDetailP
           <table className="min-w-full text-sm text-left text-gray-700">
             <thead className="bg-gray-100 text-gray-900">
               <tr>
-                <th className="px-4 py-2 text-center">NO</th>
-                <th className="px-4 py-2 text-center">PRODUCT</th>
-                <th className="px-4 py-2 text-center">QUANTITY</th>
+                <th className="px-4 py-2 text-center">No</th>
+                <th className="px-4 py-2 text-center">Product</th>
+                <th className="px-4 py-2 text-center">Quantity</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-200">
