@@ -26,11 +26,10 @@ export const ProductFormTemplate = ({ mode, id }: Props) => {
         headers: { Authorization: `Bearer ${savedToken}` },
       })
       .then((res) => {
-        // Pastikan kita mengakses data dengan benar dan mengkonversi price ke number
         const productData = res.data.data;
         setInitialData({
           ...productData,
-          price: Number(productData.price) // Konversi price ke number
+          price: Number(productData.price)
         });
       })
       .catch((err) => {
@@ -72,7 +71,7 @@ export const ProductFormTemplate = ({ mode, id }: Props) => {
   };
 
   return (
-    <div className="min-h-screen flex justify-center items-start pt-10 bg-gray-100">
+    <div className="min-h-screen flex justify-center items-start pt-24 bg-gray-100">
       <div className="bg-white p-6 rounded-lg shadow w-full max-w-md">
         <h2 className="text-xl font-bold mb-4 text-center text-gray-900">
           {mode === 'create' ? 'Add New Product' : 'Edit Product'}

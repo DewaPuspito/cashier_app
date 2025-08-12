@@ -16,7 +16,10 @@ const productSchema = z.object({
   name: z.string().min(1, { message: "Product name must be at least 1 character" }),
   price: z.number().int({ message: "Price must be a number" }).positive({ message: "Price must be greater than zero" }),
   stock: z.number().int({ message: "Stock must be a number" }),
-  category: z.enum(["FOOD", "DRINK", "CLOTHING", "ELECTRONICS", "HEALTH", "STATIONERY"], {
+  category: z.enum(["FRUITS", "VEGETABLES", "CANNED_GOODS", "DAIRY", "MEAT", "SEAFOOD", "DELI", 
+    "CONDIMENTS_SPICES", "SNACKS", "BREAD_AND_BAKERY", "BEVERAGES", "PASTA_RICE_CEREAL", 
+    "BAKING", "FROZEN_FOODS", "PERSONAL_CARE", "HEALTH_CARE", "HOUSEHOLD", "BABY_ITEMS", 
+    "PET_SUPPLIES", "AUTOMOTIVE", "ELECTRONICS", "SPORTS_OUTDOORS", "TOYS", "STATIONERIES", "CLOTHING"], {
     invalid_type_error: "Invalid category"
   }),
   imageUrl: z.instanceof(File).or(z.string().url({ message: "Invalid image URL" }))
@@ -27,7 +30,7 @@ export const ProductForm = ({ initialData, onSubmit }: ProductFormProps) => {
     name: '',
     price: 0,
     stock: 0,
-    category: Category.FOOD,
+    category: Category.Fruits,
     imageUrl: '',
   });
 
@@ -127,7 +130,11 @@ export const ProductForm = ({ initialData, onSubmit }: ProductFormProps) => {
         >
           {Object.values(Category).map((category) => (
             <option key={category} value={category}>
-              {category}
+              {category
+                .toLowerCase()
+                .split('_')
+                .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                .join(' ')}
             </option>
           ))}
         </select>

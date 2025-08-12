@@ -18,12 +18,16 @@ export const productSchema = {
       .int({ message: "Stock must be a number" })
       .optional(),
 
-    category: zod
-     .enum(["FOOD", "DRINK", "CLOTHING", "ELECTRONICS", "HEALTH", "STATIONERY"], {
-      required_error: "Category is required",
-      invalid_type_error: "Invalid category",
-     })
-     .optional(),
+      category: zod
+      .enum(["FRUITS", "VEGETABLES", "CANNED_GOODS", "DAIRY", "MEAT", "SEAFOOD", "DELI", 
+        "CONDIMENTS_SPICES", "SNACKS", "BREAD_AND_BAKERY", "BEVERAGES", "PASTA_RICE_CEREAL", 
+        "BAKING", "FROZEN_FOODS", "PERSONAL_CARE", "HEALTH_CARE", "HOUSEHOLD", "BABY_ITEMS", 
+        "PET_SUPPLIES", "AUTOMOTIVE", "ELECTRONICS", "SPORTS_OUTDOORS", "TOYS", "STATIONERIES", 
+        "CLOTHING"], {
+       required_error: "Category is required",
+       invalid_type_error: "Invalid category",
+      })
+      .optional(),
 
     imageUrl: zod
      .string({ required_error: "Image URL is required" })

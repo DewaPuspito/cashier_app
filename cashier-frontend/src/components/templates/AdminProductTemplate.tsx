@@ -99,20 +99,18 @@ export const AdminProductTemplate = () => {
     fetchProducts();
   }, [token, searchQuery]);
 
-  // Edit product
   const handleEdit = (product: Product) => {
     window.location.href = `/admin/products/${product.id}/edit-product`;
   };
 
-  // Delete product
   const handleDelete = async (productId: string) => {
     const result = await Swal.fire({
       title: 'Are you sure?',
       text: 'Product data will be deleted permanently.',
       icon: 'warning',
       showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
+      confirmButtonColor: '#d33',
+      cancelButtonColor: '#3085d6',
       confirmButtonText: 'Yes',
       cancelButtonText: 'Cancel',
     });
@@ -125,7 +123,7 @@ export const AdminProductTemplate = () => {
       });
 
       Swal.fire('Deleted!', 'Product data has been deleted.', 'success');
-      fetchProducts(); // refresh list
+      fetchProducts();
     } catch (err) {
       console.error('Failed to delete product:', err);
       Swal.fire(
