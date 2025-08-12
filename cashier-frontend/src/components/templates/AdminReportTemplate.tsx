@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from "react";
+import { useSearchParams, useRouter } from "next/navigation";
 import axios from "@/lib/axios";
 import { DateFilter } from "@/components/molecules/DateFilter";
 import { ReportTable } from "@/components/organisms/ReportTable";
@@ -10,7 +11,9 @@ import { PaginationControls } from "@/components/molecules/PaginationControls";
 import { ShiftReport, SoldProduct, Summary } from "@/types/report";
 
 export const AdminReportTemplate = () => {
-  const [date, setDate] = useState(() => new Date().toISOString().slice(0, 10));
+  const searchParams = useSearchParams();
+  const router = useRouter();
+  const [date, setDate] = useState(() => searchParams.get("date") || new Date().toISOString().slice(0, 10));
   const [summary, setSummary] = useState<Summary | null>(null);
   const [shiftReports, setShiftReports] = useState<ShiftReport[]>([]);
   const [soldProducts, setSoldProducts] = useState<SoldProduct[]>([]);
@@ -57,11 +60,24 @@ export const AdminReportTemplate = () => {
     fetchReports();
   }, [date, pageShift, pageSold]);
 
+  const updateURL = (newDate: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    params.set("date", newDate);
+    router.push(`?${params.toString()}`);
+  };
+
+  const handleDateChange = (d: string) => {
+    setDate(d);
+    setPageShift(1);
+    setPageSold(1);
+    updateURL(d);
+  };
+
   return (
-    <div className="min-h-screen bg-gray-50 pt-20">
+   <div className="min-h-screen bg-gray-50 pt-20">
       <div className="max-w-7xl mx-auto space-y-6 px-6 py-8">
         <h2 className="text-3xl font-bold text-gray-900 text-center">Reports</h2>
-        <DateFilter value={date} onChange={(d) => {setDate(d); setPageShift(1); setPageSold(1)}} />
+          <DateFilter value={date} onChange={handleDateChange} />
         
         {summary && (
           <>

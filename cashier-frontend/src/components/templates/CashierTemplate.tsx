@@ -93,6 +93,19 @@ export const AdminCashierTemplate = () => {
     }
   };
 
+  const updateURL = () => {
+    const params = new URLSearchParams();
+    if (searchTerm) params.set('search', searchTerm);
+    if (currentPage > 1) params.set('page', currentPage.toString());
+
+    const query = params.toString();
+    router.push(query ? `?${query}` : window.location.pathname);
+  };
+
+  useEffect(() => {
+    updateURL();
+  }, [searchTerm, currentPage]);
+
   const handleDelete = async (id: string) => {
     if (!token) return console.warn('No token found for delete.');
     
@@ -138,14 +151,17 @@ export const AdminCashierTemplate = () => {
         <h2 className="text-3xl font-bold text-gray-900 text-center">Cashiers</h2>
 
         <div className="space-y-4">
-          <SearchBar onSearch={(query: string) => setSearchTerm(query)}>
-            <Button 
-                variant="primary" 
-                onClick={() => router.push('/admin/cashier/create-cashier')} 
-                className="px-3 py-1 text-sm border text-green-600 hover:bg-green-700 rounded-lg"
-              >
-                + Add Cashier
-              </Button>
+          <SearchBar 
+            onSearch={setSearchTerm} 
+            context="cashier"
+            initialSearchValue={searchTerm}
+          >
+            <Button
+              variant="primary"
+              onClick={() => router.push('/admin/cashier/create-cashier')}
+            >
+              + Add Cashier
+            </Button>
           </SearchBar>
 
           <CashierTable
