@@ -10,10 +10,6 @@ interface Transaction {
   amount: number
   paymentType: string
   createdAt: string
-  cashier: {
-    name: string
-    email: string
-  }
 }
 
 interface TransactionHistoryProps {

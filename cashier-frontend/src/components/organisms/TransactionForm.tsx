@@ -39,14 +39,16 @@ interface TransactionFormProps {
   products: Product[];
   shiftId: string;
   onSubmit: (input: TransactionInput) => void;
-  isSubmitting: boolean
+  isSubmitting: boolean;
+  onReset?: () => void;
 }
 
 export const TransactionForm: React.FC<TransactionFormProps> = ({
   products,
   shiftId,
   onSubmit,
-  isSubmitting
+  isSubmitting,
+  onReset
 }) => {
   const [items, setItems] = useState<TransactionItemInput[]>([
     { productId: '', quantity: 1 },
@@ -77,6 +79,15 @@ export const TransactionForm: React.FC<TransactionFormProps> = ({
       const product = products.find(p => p.id === item.productId);
       return acc + (product ? product.price * item.quantity : 0);
     }, 0);
+  };
+
+  const resetForm = () => {
+    setItems([{ productId: '', quantity: 1 }]);
+    setPaymentType('CASH');
+    setCashReceived(0);
+    setCardNumber('');
+    setErrors({});
+    onReset?.();
   };
 
   const handleSubmit = () => {

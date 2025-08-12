@@ -16,6 +16,7 @@ export const TransactionFormTemplate = () => {
   const [products, setProducts] = useState<Product[]>([])
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [token, setToken] = useState<string | null>(null)
+  const [formKey, setFormKey] = useState(0);
   const router = useRouter()
 
   useEffect(() => {
@@ -76,6 +77,7 @@ export const TransactionFormTemplate = () => {
       })
 
       toast.success('Transaction successful!')
+      setFormKey(prev => prev + 1);
       router.push(`/cashier/shift/${shiftId}/transaction`)
     } catch (error) {
       console.error(error)
@@ -91,6 +93,7 @@ export const TransactionFormTemplate = () => {
     <div className="p-8 max-w-4xl mx-auto">
       <h1 className="text-2xl font-bold mb-4 text-black text-center">New Transaction</h1>
       <TransactionForm
+        key={formKey}
         products={products}
         onSubmit={handleSubmit}
         isSubmitting={isSubmitting}
