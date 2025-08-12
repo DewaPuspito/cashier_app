@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import axios from '@/lib/axios'
+import { Badge } from '../atomics/Badge'
 import { Button } from '../atomics/Button'
 import { PaginationControls } from '../molecules/PaginationControls'
 
@@ -120,9 +121,9 @@ export function TransactionHistory({ shiftId }: TransactionHistoryProps) {
                   <td className="whitespace-nowrap px-4 py-3 align-middle text-gray-700">{startIndex + index + 1}</td>
                   <td className="whitespace-nowrap px-4 py-3 align-middle text-gray-700">Rp {transaction.amount.toLocaleString()}</td>
                   <td className="whitespace-nowrap px-4 py-3 align-middle text-gray-700">
-                    <span className="px-2 py-1 rounded-full text-xs bg-blue-100 text-blue-700">
+                    <Badge color={transaction.paymentType === 'CASH' ? 'green' : 'blue'}>
                       {transaction.paymentType}
-                    </span>
+                    </Badge>
                   </td>
                   <td className="whitespace-nowrap px-4 py-3 align-middle text-gray-700">{new Date(transaction.createdAt).toLocaleString()}</td>
                   <td className="whitespace-nowrap px-4 py-3 align-middle text-gray-700">

@@ -5,7 +5,7 @@ import { TransactionInput } from '@/types/transaction'
 import { TransactionForm } from '@/components/organisms/TransactionForm'
 import { Product } from '@/types/product'
 import axios from '@/lib/axios'
-import Swal from 'sweetalert2'
+import toast from 'react-hot-toast'
 import { useRouter, useParams } from 'next/navigation'
 import { useAuthStore } from '@/stores/useAuthStore'
 
@@ -75,19 +75,11 @@ export const TransactionFormTemplate = () => {
         },
       })
 
-      Swal.fire({
-        icon: 'success',
-        title: 'Transaction successful!',
-      })
-
+      toast.success('Transaction successful!')
       router.push(`/cashier/shift/${shiftId}/transaction`)
     } catch (error) {
       console.error(error)
-      Swal.fire({
-        icon: 'error',
-        title: 'Transaction failed',
-        text: 'Please try again.',
-      })
+      toast.error('Transaction failed. Please try again.')
     } finally {
       setIsSubmitting(false)
     }
