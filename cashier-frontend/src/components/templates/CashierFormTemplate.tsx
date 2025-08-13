@@ -45,7 +45,13 @@ export const CashierFormTemplate = ({ mode, id }: Props) => {
         });
         toast.success('Cashier successfully added');
       } else if (id) {
-        await axios.put(`/cashier/${id}`, data, {
+        const updateData = {
+          name: data.name,
+          email: data.email,
+          ...(data.password ? { password: data.password } : {})
+        };
+
+        await axios.put(`/cashier/${id}`, updateData, {
           headers: { Authorization: `Bearer ${token}` },
         });
         toast.success('Cashier successfully updated');

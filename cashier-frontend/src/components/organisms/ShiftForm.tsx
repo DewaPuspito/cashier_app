@@ -42,11 +42,18 @@ export default function ShiftForm() {
           router.push('/login');
           return;
         }
-
+  
+        const cashier = useAuthStore.getState().cashier;
+        if (!cashier) {
+          setActiveShiftId(null);
+          setIsShiftStarted(false);
+          return;
+        }
+    
         const response = await axios.get('/shift/active', {
           headers: { Authorization: `Bearer ${token}` }
         });
-
+    
         if (response.data?.data) {
           const { id } = response.data.data;
           setActiveShiftId(id);
@@ -60,6 +67,12 @@ export default function ShiftForm() {
         console.error('Failed to check active shift:', error);
         setActiveShiftId(null);
         setIsShiftStarted(false);
+        if (error && typeof error === 'object' && 'response' in error) {
+          const axiosError = error as { response?: { status: number } };
+          if (axiosError.response?.status !== 403) {
+            toast.error('Failed to check active shift');
+          }
+        }
       }
     };
 
